@@ -3,38 +3,45 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>METABOLICBUDDY 5.0 - Integrasi SATUSEHAT</title>
+
+    <title>METABOLICBUDDY 5.0 — Purwarupa Interaktif</title>
+
     <script src="https://cdn.tailwindcss.com"></script>
+
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Inter:wght@400;500;600;700&display=swap');
-        
+
         :root {
-            /* Warna Khas Kemenkes/SATUSEHAT */
-            --ss-green: #00928F;
-            --ss-light: #E0F2F1;
-            /* Warna Modul METABOLICBUDDY */
-            --mb-bg: #F9FAFB;
-            --mb-primary: #8B5CF6; 
-            --mb-dark: #4C1D95;
-        }
-        
-        body {
-            background-color: #E5E7EB;
-            font-family: 'Inter', sans-serif;
-            color: #1F2937;
-            margin: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
+            --primary-purple: #8B5CF6;
+            --dark-purple: #4C1D95;
+            --soft-purple: #F3E8FF;
+            --teal: #00928F;
+            --text-main: #1F2937;
         }
 
-        .font-serif-custom { font-family: 'Lora', 'Times New Roman', serif; }
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: #E5E7EB;
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .font-serif-custom {
+            font-family: 'Lora', 'Times New Roman', serif;
+        }
 
         .mobile-frame {
             width: 100%;
             height: 100vh;
-            background-color: #FFFFFF;
+            background: #FAFAFA;
             position: relative;
             overflow: hidden;
             display: flex;
@@ -47,516 +54,2573 @@
                 height: 844px;
                 max-height: 95vh;
                 border-radius: 40px;
-                box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
                 border: 8px solid #111827;
+                box-shadow: 0 25px 50px -12px rgba(0,0,0,.25);
             }
         }
 
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-
-        .fade-in { animation: fadeIn 0.3s ease-in-out forwards; }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
         }
 
-        .nav-active { color: var(--mb-primary); font-weight: 700; transform: scale(1.1); }
-        
-        /* Notifikasi Toast SATUSEHAT */
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        .fade-in {
+            animation: fadeIn .3s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .pop-animation {
+            animation: pop .4s cubic-bezier(.175,.885,.32,1.275) both;
+        }
+
+        @keyframes pop {
+            0% {
+                transform: scale(.8);
+                opacity: 0;
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .nav-active {
+            color: var(--primary-purple) !important;
+            font-weight: 700;
+            transform: scale(1.08);
+        }
+
+        .progress-bar {
+            transition: width .6s ease;
+        }
+
+        .mini-card {
+            border: 1px solid #E5E7EB;
+            background: white;
+            border-radius: 16px;
+            padding: 12px;
+        }
+
+        .section-title {
+            font-size: 11px;
+            font-weight: 700;
+            color: #374151;
+            text-transform: uppercase;
+            letter-spacing: .06em;
+        }
+
+        /* TOAST */
         #toast-container {
             position: absolute;
-            top: 20px;
+            top: 55px;
             left: 50%;
             transform: translateX(-50%);
-            z-index: 100;
+            width: 90%;
+            z-index: 200;
             display: flex;
             flex-direction: column;
-            gap: 10px;
-            width: 90%;
+            gap: 8px;
         }
+
         .toast {
-            background-color: var(--mb-dark);
+            background: var(--dark-purple);
             color: white;
-            padding: 12px 16px;
+            padding: 11px 14px;
             border-radius: 12px;
-            font-size: 12px;
-            font-weight: 500;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            font-size: 11px;
+            font-weight: 600;
             text-align: center;
-            animation: slideDown 0.3s ease-out forwards, fadeOut 0.3s ease-in 2.7s forwards;
-            opacity: 0;
+            box-shadow: 0 5px 15px rgba(0,0,0,.18);
+            animation: toastIn .25s ease-out forwards;
         }
-        @keyframes slideDown { from { transform: translateY(-20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
+
+        @keyframes toastIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* SIMPLE BAR */
+        .bar {
+            height: 7px;
+            background: #F3F4F6;
+            border-radius: 999px;
+            overflow: hidden;
+        }
+
+        .bar > div {
+            height: 100%;
+            border-radius: 999px;
+        }
     </style>
 </head>
+
 <body>
 
-    <div class="mobile-frame">
-        <div id="toast-container"></div>
+<div class="mobile-frame">
 
-        <!-- Status Bar (Global) -->
-        <div class="flex justify-between items-center px-6 py-3 text-xs font-medium text-gray-800 bg-white z-20 shadow-sm relative">
-            <span id="clock">09:41</span>
-            <div class="flex gap-1.5 items-center">
-                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
-                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.08 2.93 1 9zm8 8l3 3 3-3c-1.65-1.66-4.36-1.66-6 0zm-4-4l2 2c2.76-2.76 7.24-2.76 10 0l2-2C15.14 9.14 8.87 9.14 5 13z"/></svg>
-            </div>
-        </div>
+    <!-- =========================================================
+         TOAST
+    ========================================================== -->
+    <div id="toast-container"></div>
 
-        <div id="app-content" class="flex-1 overflow-y-auto no-scrollbar pb-24 relative bg-gray-50">
-            
-            <!-- ================= LAYAR 0: LOGIN & SATUSEHAT ENTRY ================= -->
-            <div id="screen-satusehat" class="flex flex-col h-full bg-white fade-in">
-                <!-- SATUSEHAT Header -->
-                <div class="bg-[#00928F] text-white px-6 pt-6 pb-8 rounded-b-3xl shadow-md">
-                    <div class="flex justify-between items-center mb-6">
-                        <h1 class="font-bold text-xl tracking-wide">SATUSEHAT</h1>
-                        <div class="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">👤</div>
-                    </div>
-                    <p class="text-xs text-[#E0F2F1] mb-1">Selamat Pagi,</p>
-                    <h2 class="font-bold text-lg">Sofia Ghina Syahira</h2>
-                    <p class="text-[10px] mt-2 bg-white/20 inline-block px-3 py-1 rounded-full border border-white/30">NIK: 167104********24</p>
-                </div>
+    <!-- =========================================================
+         STATUS BAR
+    ========================================================== -->
+    <div class="flex justify-between items-center px-6 py-3 text-xs font-medium text-gray-800 bg-white z-20 shadow-sm">
+        <span id="clock">09:41</span>
 
-                <div class="px-6 mt-6">
-                    <h3 class="font-bold text-sm text-gray-800 mb-4">Layanan Kesehatan Anda</h3>
-                    <div class="grid grid-cols-4 gap-4 mb-8">
-                        <div class="flex flex-col items-center gap-2 cursor-not-allowed opacity-60">
-                            <div class="w-12 h-12 bg-gray-100 rounded-2xl flex items-center justify-center text-xl">📄</div>
-                            <span class="text-[9px] text-center font-medium text-gray-600">Resume<br>Medis</span>
-                        </div>
-                        <div class="flex flex-col items-center gap-2 cursor-not-allowed opacity-60">
-                            <div class="w-12 h-12 bg-gray-100 rounded-2xl flex items-center justify-center text-xl">💉</div>
-                            <span class="text-[9px] text-center font-medium text-gray-600">Vaksin &<br>Imunisasi</span>
-                        </div>
-                        <div class="flex flex-col items-center gap-2 cursor-not-allowed opacity-60">
-                            <div class="w-12 h-12 bg-gray-100 rounded-2xl flex items-center justify-center text-xl">🏥</div>
-                            <span class="text-[9px] text-center font-medium text-gray-600">Cari<br>Kamar</span>
-                        </div>
-                        <!-- Entry Point METABOLICBUDDY -->
-                        <div onclick="openMetabolicBuddy()" class="flex flex-col items-center gap-2 cursor-pointer transform hover:scale-105 transition">
-                            <div class="w-12 h-12 bg-purple-100 border border-purple-300 rounded-2xl flex items-center justify-center text-xl shadow-sm relative">
-                                📊
-                                <span class="absolute -top-1 -right-1 flex h-3 w-3">
-                                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-purple-400 opacity-75"></span>
-                                  <span class="relative inline-flex rounded-full h-3 w-3 bg-purple-600"></span>
-                                </span>
-                            </div>
-                            <span class="text-[9px] text-center font-bold text-purple-700">Diari<br>Sehat</span>
-                        </div>
-                    </div>
+        <div class="flex gap-1.5 items-center">
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/>
+            </svg>
 
-                    <div class="bg-[#E0F2F1] rounded-2xl p-4 border border-[#00928F]/20 flex items-center justify-between">
-                        <div>
-                            <h4 class="font-bold text-xs text-[#00928F] mb-1">Modul METABOLICBUDDY 5.0</h4>
-                            <p class="text-[10px] text-teal-800">Cegah diabetes dari pola harianmu. Modul ini terintegrasi API Satu Data.</p>
-                        </div>
-                        <div class="text-2xl ml-2">✨</div>
-                    </div>
-                </div>
-            </div>
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.08 2.93 1 9z"/>
+            </svg>
 
-            <!-- ================= LAYAR 1: BERANDA MB 5.0 ================= -->
-            <div id="screen-home" class="hidden px-6 pt-5 pb-6 fade-in min-h-full">
-                <!-- Header Integrasi -->
-                <div class="flex justify-between items-center mb-6">
-                    <div>
-                        <h1 class="font-serif-custom font-bold text-lg text-purple-900">METABOLICBUDDY <span class="text-xs font-normal">5.0</span></h1>
-                        <p class="text-[10px] text-gray-500 font-medium flex items-center gap-1 mt-1">
-                            <span class="w-2 h-2 rounded-full bg-green-500"></span> Terhubung SATUSEHAT
-                        </p>
-                    </div>
-                </div>
-
-                <!-- Gamifikasi: HP & Streak -->
-                <div class="grid grid-cols-2 gap-3 mb-6">
-                    <div class="bg-white border border-purple-100 rounded-2xl p-4 shadow-sm flex flex-col items-center">
-                        <span class="text-2xl mb-1">🔥</span>
-                        <span class="text-xl font-bold text-gray-800" id="displayStreak">4</span>
-                        <span class="text-[10px] font-semibold text-gray-500 uppercase tracking-wider">Hari Streak</span>
-                    </div>
-                    <div class="bg-gradient-to-br from-purple-500 to-purple-700 rounded-2xl p-4 shadow-md flex flex-col items-center text-white relative overflow-hidden">
-                        <span class="text-2xl mb-1 relative z-10">⭐</span>
-                        <span class="text-xl font-bold relative z-10" id="displayHP">120</span>
-                        <span class="text-[10px] font-semibold text-purple-200 uppercase tracking-wider relative z-10">Health Points</span>
-                    </div>
-                </div>
-
-                <!-- API Integration Notice -->
-                <div class="bg-white border border-gray-200 rounded-xl p-3 mb-5 shadow-sm flex items-center gap-3">
-                    <div class="w-8 h-8 bg-blue-50 rounded-full flex items-center justify-center text-lg">⌚</div>
-                    <div class="flex-1">
-                        <h4 class="text-xs font-bold text-gray-800">Sinkronisasi Aktivitas Aktif</h4>
-                        <p class="text-[9px] text-gray-500">Data langkah dari <i>Google Fit / Apple Health</i> ditarik otomatis.</p>
-                    </div>
-                </div>
-
-                <h3 class="font-bold text-xs text-gray-800 uppercase tracking-wider mb-3">Tantangan Mingguan</h3>
-                <div class="bg-white border border-gray-200 rounded-2xl p-4 shadow-sm mb-6">
-                    <div class="flex justify-between items-center mb-2">
-                        <span class="text-xs font-bold text-gray-800">Terapkan 5 Smart Swap</span>
-                        <span class="text-[10px] font-bold text-purple-600 bg-purple-50 px-2 py-1 rounded">+50 HP</span>
-                    </div>
-                    <div class="w-full bg-gray-100 rounded-full h-2 mb-2">
-                        <div class="bg-purple-500 h-2 rounded-full" style="width: 60%"></div>
-                    </div>
-                    <p class="text-[10px] text-gray-500 text-right">3/5 Selesai</p>
-                </div>
-            </div>
-
-            <!-- ================= LAYAR 2: SCAN PANGAN ================= -->
-            <div id="screen-scan" class="hidden px-6 pt-5 pb-6 fade-in min-h-full">
-                <div class="flex items-center mb-6 pb-2 border-b border-purple-100">
-                    <h1 class="font-serif-custom font-bold text-lg text-purple-900 flex-1 text-center">Scan Pangan</h1>
-                </div>
-
-                <div id="scan-placeholder" class="bg-purple-50 border border-purple-200 rounded-2xl p-6 mb-6 relative h-64 flex flex-col items-center justify-center text-center">
-                    <div class="text-4xl mb-3 opacity-50">📷</div>
-                    <p class="text-xs text-gray-600 mb-5 leading-relaxed">Arahkan kamera ke hidangan. Computer Vision AI akan memindai jenis dan estimasi porsi.</p>
-                    <button onclick="simulateScan()" class="bg-purple-600 text-white px-6 py-3 rounded-xl text-sm font-bold shadow-md hover:bg-purple-700 transition">
-                        Simulasi Scan AI
-                    </button>
-                </div>
-
-                <div id="scan-result" class="hidden">
-                    <div class="relative w-full h-48 rounded-xl overflow-hidden mb-5 border-2 border-purple-200">
-                        <img src="https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=600&q=80" alt="Makanan" class="w-full h-full object-cover">
-                        <div class="absolute inset-0 border-2 border-purple-500 border-dashed opacity-80 m-4 rounded-lg"></div>
-                        <span class="absolute top-6 left-6 bg-purple-600 text-white text-[10px] font-bold px-2 py-1 rounded shadow">CNN ResNet-50</span>
-                    </div>
-                    <div class="bg-white rounded-xl p-4 mb-6 border border-purple-100 shadow-sm">
-                        <p class="text-[10px] text-gray-500 font-bold uppercase mb-1">Terdeteksi:</p>
-                        <p class="text-sm text-gray-800 font-bold mb-3 border-b border-gray-100 pb-2">Nasi + Ayam + Minuman Manis</p>
-                        <p class="text-[10px] text-gray-500 font-bold uppercase mb-1">Estimasi Porsi:</p>
-                        <p class="text-sm text-gray-800 font-bold">1 Porsi (Tinggi Karbohidrat Sederhana)</p>
-                    </div>
-                    <button onclick="saveScan()" class="w-full bg-purple-100 hover:bg-purple-200 text-purple-900 font-bold py-3.5 rounded-xl transition text-sm">
-                        Simpan ke Profil Perilaku
-                    </button>
-                </div>
-                <p class="text-[10px] text-gray-400 italic text-center mt-6">Hasil pengenalan merupakan estimasi visual.</p>
-            </div>
-
-            <!-- ================= LAYAR 3: METABOLIC BEHAVIOR PROFILE ================= -->
-            <div id="screen-profile" class="hidden px-6 pt-5 pb-6 fade-in min-h-full">
-                <div class="flex items-center mb-4 pb-2 border-b border-purple-100">
-                    <h1 class="font-serif-custom italic font-bold text-lg text-purple-900 flex-1 text-center">Metabolic Behavior Profile</h1>
-                </div>
-                <p class="text-[11px] text-gray-600 mb-5 text-center">Ringkasan pola kebiasaan dari integrasi data pangan & aktivitas harian.</p>
-
-                <!-- Kategori Perilaku -->
-                <div class="bg-purple-50 border border-purple-200 rounded-xl p-4 shadow-sm flex items-center justify-between mb-5">
-                    <div>
-                        <h3 class="font-bold text-xs text-gray-800 mb-0.5">Status Pola Perilaku</h3>
-                        <p class="text-[10px] text-gray-500">Perbaikan perlu dilakukan bertahap.</p>
-                    </div>
-                    <span class="text-xs font-bold text-amber-700 bg-amber-100 px-3 py-1.5 rounded-lg border border-amber-200">Perlu Perhatian</span>
-                </div>
-
-                <div class="space-y-3 mb-6">
-                    <div class="bg-white border border-gray-200 rounded-xl p-4 flex gap-4 shadow-sm items-center">
-                        <div class="text-2xl bg-gray-50 p-2 rounded-full">🍽️</div>
-                        <div>
-                            <h3 class="font-bold text-xs text-gray-800 mb-0.5">Pola Konsumsi</h3>
-                            <p class="text-[11px] text-gray-500 leading-relaxed">Minuman tinggi gula dan pangan ultra-proses muncul beberapa kali.</p>
-                        </div>
-                    </div>
-
-                    <div class="bg-white border border-gray-200 rounded-xl p-4 flex gap-4 shadow-sm items-center relative">
-                        <div class="text-2xl bg-gray-50 p-2 rounded-full">🚶</div>
-                        <div>
-                            <h3 class="font-bold text-xs text-gray-800 mb-0.5">Pola Aktivitas</h3>
-                            <p class="text-[11px] text-gray-500 leading-relaxed">Aktivitas fisik cukup, tetapi masih terdapat kecenderungan sedentari.</p>
-                        </div>
-                        <span class="absolute top-2 right-2 flex h-2 w-2">
-                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
-                            <span class="relative inline-flex rounded-full h-2 w-2 bg-blue-500" title="Data dari Google Fit via SATUSEHAT"></span>
-                        </span>
-                    </div>
-                    
-                    <div class="bg-white border border-gray-200 rounded-xl p-4 flex gap-4 shadow-sm items-center">
-                        <div class="text-2xl bg-gray-50 p-2 rounded-full">🔄</div>
-                        <div>
-                            <h3 class="font-bold text-xs text-gray-800 mb-0.5">Konsistensi Kebiasaan</h3>
-                            <p class="text-[11px] text-gray-500 leading-relaxed">Konsistensi penerapan pola sehat masih belum terbentuk utuh.</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="bg-gray-100 rounded-xl p-3 border border-gray-200 text-center">
-                    <p class="text-[9px] text-gray-500 italic font-medium">Sistem ini tidak mendiagnosis diabetes dan tidak menggantikan pemeriksaan kadar gula darah.</p>
-                </div>
-            </div>
-
-            <!-- ================= LAYAR 4: ADAPTIVE MICRO-NUDGE & SWAPPING ================= -->
-            <div id="screen-nudge" class="hidden px-6 pt-5 pb-6 fade-in min-h-full">
-                <div class="flex items-center mb-6 pb-2 border-b border-purple-100">
-                    <h1 class="font-serif-custom italic font-bold text-lg text-purple-900 flex-1 text-center">Adaptive Micro-Nudge</h1>
-                </div>
-
-                <div class="bg-purple-50 rounded-2xl p-5 mb-6 border border-purple-200 shadow-sm relative overflow-hidden">
-                    <div class="absolute -right-4 -top-4 text-7xl opacity-5">💡</div>
-                    <h3 class="font-bold text-xs text-purple-900 mb-2 relative z-10 flex items-center gap-1">Umpan Balik Preventif</h3>
-                    <p class="text-xs text-purple-900 leading-relaxed relative z-10 font-medium">
-                        "Minuman manis tinggi gula beberapa kali dipilih. Untuk pilihan berikutnya, coba ukuran lebih kecil atau minuman tanpa tambahan gula."
-                    </p>
-                </div>
-
-                <h3 class="font-bold text-xs text-gray-800 uppercase tracking-wider mb-3">Smart Swapping</h3>
-                <div class="bg-white border border-gray-200 rounded-2xl p-5 shadow-sm text-center mb-6">
-                    <div class="flex items-center justify-between px-2 mb-6">
-                        <div class="flex flex-col items-center">
-                            <div class="w-12 h-12 bg-gray-50 rounded-full flex items-center justify-center text-3xl mb-2">🧋</div>
-                            <span class="text-[10px] text-gray-500 font-medium w-16 leading-tight">Minuman Manis</span>
-                        </div>
-                        <span class="text-2xl text-purple-500 font-bold">→</span>
-                        <div class="flex flex-col items-center">
-                            <div class="w-12 h-12 bg-purple-50 rounded-full flex items-center justify-center text-3xl mb-2 border border-purple-100">💧</div>
-                            <span class="text-[10px] text-gray-800 font-bold w-16 leading-tight">Tanpa Tambahan Gula</span>
-                        </div>
-                    </div>
-
-                    <button id="btnReward" onclick="claimReward()" class="w-full bg-purple-100 hover:bg-purple-200 text-purple-900 font-bold py-3.5 rounded-xl transition text-xs shadow-sm flex justify-center items-center gap-2">
-                        Terapkan Keputusan Ini <span class="bg-purple-500 text-white px-2 py-0.5 rounded text-[10px] shadow-sm">+25 HP</span>
-                    </button>
-                </div>
-
-                <!-- INTEGRASI RUJUKAN SATUSEHAT -->
-                <div id="skrining-box" class="hidden mt-6 bg-red-50 border border-red-200 rounded-2xl p-5 text-center fade-in">
-                    <h4 class="text-xs font-bold text-red-800 mb-2 flex justify-center items-center gap-1">⚠️ Rekomendasi Medis</h4>
-                    <p class="text-[10px] text-red-700 leading-relaxed mb-4">Pola perilaku "Perlu Perhatian" muncul berulang dalam 14 hari. Sistem menyarankan verifikasi kesehatan formal (Skrining Glukosa).</p>
-                    <button onclick="rujukFaskes()" class="text-[10px] font-bold text-white bg-red-600 px-5 py-3 rounded-xl hover:bg-red-700 transition w-full shadow-sm flex justify-center items-center gap-2">
-                        🏥 Daftar Antrean FKTP via SATUSEHAT
-                    </button>
-                </div>
-            </div>
-
-            <!-- ================= LAYAR 5: PROFIL SISTEM & UNDUH ================= -->
-            <div id="screen-user" class="hidden px-6 pt-5 pb-6 fade-in min-h-full">
-                <div class="flex items-center mb-6 pb-2 border-b border-purple-100">
-                    <h1 class="font-serif-custom font-bold text-lg text-purple-900 flex-1 text-center">Profil & Keamanan RME</h1>
-                </div>
-
-                <div class="bg-white border border-gray-200 rounded-2xl p-5 mb-5 shadow-sm text-center">
-                    <div class="text-3xl mb-3">📥</div>
-                    <h3 class="font-bold text-sm text-gray-800 mb-2">Unduh Diagram Konseptual</h3>
-                    <p class="text-[10px] text-gray-500 leading-relaxed mb-5">Simpan Diagram Mekanisme METABOLICBUDDY 5.0 (Visualisasi Gambar 1 pada Naskah Esai).</p>
-                    <div class="flex gap-2">
-                        <button onclick="downloadDiagram('svg')" class="flex-1 bg-purple-50 text-purple-800 py-3 rounded-xl text-xs font-bold border border-purple-200 hover:bg-purple-100 transition shadow-sm">Unduh SVG</button>
-                        <button onclick="downloadDiagram('png')" class="flex-1 bg-purple-600 text-white py-3 rounded-xl text-xs font-bold hover:bg-purple-700 transition shadow-sm">Unduh PNG</button>
-                    </div>
-                </div>
-
-                <div class="bg-gray-100 rounded-2xl p-4 border border-gray-200 text-center shadow-inner mb-6">
-                    <h4 class="font-bold text-[10px] text-gray-700 mb-1">Tata Kelola Data (RME)</h4>
-                    <p class="text-[9px] text-gray-500 leading-relaxed">
-                        Data riwayat perilaku dienkripsi dan diintegrasikan langsung ke dalam arsitektur Satu Data Kesehatan SATUSEHAT Mobile. METABOLICBUDDY 5.0 patuh pada asas privasi pasien.
-                    </p>
-                </div>
-                
-                <button onclick="keluarSistem()" class="w-full text-[10px] font-bold text-red-500 py-3 rounded-xl border border-red-100 bg-white">Keluar dari Modul</button>
-            </div>
-
-        </div>
-
-        <!-- Bottom Navigation Mobile -->
-        <div id="bottom-nav" class="bg-white border-t border-gray-200 px-4 py-2.5 flex justify-between items-center absolute bottom-0 w-full z-50 hidden shadow-[0_-4px_10px_rgba(0,0,0,0.03)]">
-            <button onclick="navigate('home', 'nav-home')" id="nav-home" class="nav-active flex flex-col items-center gap-1 text-gray-400 w-1/5 transition-transform duration-200">
-                <span class="text-xl">🏠</span><span class="text-[9px] font-medium tracking-tight">Beranda</span>
-            </button>
-            <button onclick="navigate('scan', 'nav-scan')" id="nav-scan" class="flex flex-col items-center gap-1 text-gray-400 w-1/5 transition-transform duration-200">
-                <span class="text-xl">📷</span><span class="text-[9px] font-medium tracking-tight">Scan</span>
-            </button>
-            <button onclick="navigate('profile', 'nav-profile')" id="nav-profile" class="flex flex-col items-center gap-1 text-gray-400 w-1/5 transition-transform duration-200">
-                <span class="text-xl">📊</span><span class="text-[9px] font-medium tracking-tight">Pola</span>
-            </button>
-            <button onclick="navigate('nudge', 'nav-nudge')" id="nav-nudge" class="flex flex-col items-center gap-1 text-gray-400 w-1/5 transition-transform duration-200">
-                <span class="text-xl">💡</span><span class="text-[9px] font-medium tracking-tight">Nudge</span>
-            </button>
-            <button onclick="navigate('user', 'nav-user')" id="nav-user" class="flex flex-col items-center gap-1 text-gray-400 w-1/5 transition-transform duration-200">
-                <span class="text-xl">⚙️</span><span class="text-[9px] font-medium tracking-tight">Sistem</span>
-            </button>
+            <span>●</span>
         </div>
     </div>
 
-    <!-- Script Logika -->
+    <!-- =========================================================
+         MAIN CONTENT
+    ========================================================== -->
+    <div id="app-content"
+         class="flex-1 overflow-y-auto no-scrollbar pb-24 relative bg-gray-50">
+
+        <!-- =====================================================
+             SCREEN 0 — LOGIN
+        ====================================================== -->
+        <div id="screen-login"
+             class="px-6 py-10 flex flex-col h-full justify-center fade-in bg-white">
+
+            <div class="text-center mb-8">
+
+                <div class="w-20 h-20 bg-purple-50 border border-purple-200 rounded-3xl mx-auto mb-5 flex items-center justify-center text-4xl shadow-sm">
+                    🧬
+                </div>
+
+                <h1 class="font-serif-custom font-bold text-2xl text-purple-900">
+                    METABOLICBUDDY
+                    <span class="text-sm font-normal">5.0</span>
+                </h1>
+
+                <p class="text-xs text-gray-600 px-4 leading-relaxed mt-2">
+                    Integrasi <i>Metabolic Behavior Profiling</i> dan
+                    <i>Adaptive Micro-Nudge</i> untuk mendukung pencegahan
+                    diabetes pada remaja.
+                </p>
+            </div>
+
+            <div class="bg-purple-50 p-5 rounded-2xl border border-purple-200 mb-5">
+
+                <label class="block text-xs font-bold text-purple-900 mb-2">
+                    Simulasi Purwarupa
+                </label>
+
+                <input
+                    type="text"
+                    id="loginInput"
+                    placeholder="Masukkan nama Anda..."
+                    class="w-full px-4 py-3 rounded-xl border border-purple-300 focus:outline-none focus:border-purple-500 text-sm mb-4"
+                    autocomplete="off"
+                >
+
+                <button
+                    onclick="handleLogin()"
+                    class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-3.5 rounded-xl transition text-sm shadow-md">
+                    Masuk ke SATUSEHAT
+                </button>
+            </div>
+
+            <div class="bg-gray-50 rounded-2xl border border-gray-200 p-4">
+                <div class="flex gap-3">
+                    <span class="text-lg">ℹ️</span>
+                    <p class="text-[10px] text-gray-500 leading-relaxed">
+                        Purwarupa ini mensimulasikan konsep METABOLICBUDDY 5.0.
+                        Sistem tidak mengukur kadar glukosa secara langsung,
+                        tidak mendiagnosis diabetes, dan tidak menggantikan
+                        pemeriksaan medis.
+                    </p>
+                </div>
+            </div>
+
+            <p class="text-[9px] text-center text-gray-400 mt-7">
+                Lomba Esai Ilmiah Nasional — LEGIS SPACE 6.0<br>
+                Subtema: Inovasi Teknologi
+            </p>
+        </div>
+
+
+        <!-- =====================================================
+             SCREEN 1 — SATUSEHAT
+        ====================================================== -->
+        <div id="screen-satusehat"
+             class="hidden flex flex-col h-full bg-white fade-in">
+
+            <div class="bg-[#00928F] text-white px-6 pt-6 pb-8 rounded-b-3xl shadow-md">
+
+                <div class="flex justify-between items-center mb-6">
+
+                    <div>
+                        <h1 class="font-bold text-xl tracking-wide">
+                            SATUSEHAT
+                        </h1>
+
+                        <p class="text-[9px] text-teal-100 mt-0.5">
+                            Ekosistem kesehatan digital
+                        </p>
+                    </div>
+
+                    <div class="w-9 h-9 bg-white/20 rounded-full flex items-center justify-center">
+                        👤
+                    </div>
+                </div>
+
+                <p class="text-xs text-[#E0F2F1] mb-1">
+                    Selamat datang,
+                </p>
+
+                <h2
+                    class="font-bold text-lg"
+                    id="displayUserNameSatuSehat">
+                    Pengguna
+                </h2>
+
+                <p class="text-[10px] mt-2 bg-white/20 inline-block px-3 py-1 rounded-full border border-white/30">
+                    Profil pengguna simulasi
+                </p>
+            </div>
+
+            <div class="px-6 mt-6">
+
+                <h3 class="font-bold text-sm text-gray-800 mb-4">
+                    Layanan Kesehatan
+                </h3>
+
+                <div class="grid grid-cols-4 gap-4 mb-7">
+
+                    <div class="flex flex-col items-center gap-2 opacity-50">
+                        <div class="w-12 h-12 bg-gray-100 rounded-2xl flex items-center justify-center text-xl">
+                            📄
+                        </div>
+                        <span class="text-[9px] text-center">
+                            Resume<br>Medis
+                        </span>
+                    </div>
+
+                    <div class="flex flex-col items-center gap-2 opacity-50">
+                        <div class="w-12 h-12 bg-gray-100 rounded-2xl flex items-center justify-center text-xl">
+                            💉
+                        </div>
+                        <span class="text-[9px] text-center">
+                            Vaksin
+                        </span>
+                    </div>
+
+                    <div class="flex flex-col items-center gap-2 opacity-50">
+                        <div class="w-12 h-12 bg-gray-100 rounded-2xl flex items-center justify-center text-xl">
+                            🏥
+                        </div>
+                        <span class="text-[9px] text-center">
+                            Fasilitas
+                        </span>
+                    </div>
+
+                    <div
+                        onclick="openMetabolicBuddy()"
+                        class="flex flex-col items-center gap-2 cursor-pointer hover:scale-105 transition">
+
+                        <div class="w-12 h-12 bg-purple-100 border border-purple-300 rounded-2xl flex items-center justify-center text-xl shadow-sm relative">
+
+                            📊
+
+                            <span class="absolute -top-1 -right-1 flex h-3 w-3">
+                                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-purple-400 opacity-75"></span>
+                                <span class="relative inline-flex rounded-full h-3 w-3 bg-purple-600"></span>
+                            </span>
+
+                        </div>
+
+                        <span class="text-[9px] text-center font-bold text-purple-700">
+                            Diari<br>Sehat
+                        </span>
+                    </div>
+                </div>
+
+                <div class="bg-[#E0F2F1] rounded-2xl p-4 border border-[#00928F]/20">
+
+                    <div class="flex justify-between items-start gap-3">
+
+                        <div>
+                            <h4 class="font-bold text-xs text-[#00928F] mb-1">
+                                METABOLICBUDDY 5.0
+                            </h4>
+
+                            <p class="text-[10px] text-teal-800 leading-relaxed">
+                                Modul pendamping preventif untuk membantu
+                                remaja mengenali pola pangan dan aktivitas
+                                sehari-hari.
+                            </p>
+                        </div>
+
+                        <span class="text-2xl">
+                            ✨
+                        </span>
+
+                    </div>
+
+                </div>
+
+                <div class="mt-5 bg-gray-50 border border-gray-200 rounded-2xl p-4">
+
+                    <p class="section-title mb-2">
+                        Posisi dalam ekosistem
+                    </p>
+
+                    <div class="flex items-center gap-2 text-[9px] text-gray-600">
+                        <span class="px-2 py-1 bg-white rounded-lg border">
+                            SATUSEHAT
+                        </span>
+
+                        <span>→</span>
+
+                        <span class="px-2 py-1 bg-purple-50 text-purple-700 rounded-lg border border-purple-100 font-semibold">
+                            Diari Sehat
+                        </span>
+
+                        <span>→</span>
+
+                        <span class="px-2 py-1 bg-white rounded-lg border">
+                            Preventif
+                        </span>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+
+
+        <!-- =====================================================
+             SCREEN 2 — HOME
+        ====================================================== -->
+        <div id="screen-home"
+             class="hidden px-6 pt-5 pb-6 fade-in min-h-full">
+
+            <div class="flex justify-between items-center mb-5">
+
+                <div>
+                    <h1 class="font-serif-custom font-bold text-lg text-purple-900">
+                        METABOLICBUDDY
+                        <span class="text-xs font-normal">5.0</span>
+                    </h1>
+
+                    <p class="text-xs text-gray-600 mt-1">
+                        Halo,
+                        <span id="displayUserName"
+                              class="font-bold text-purple-600">
+                            Pengguna
+                        </span>
+                    </p>
+                </div>
+
+                <div class="w-9 h-9 bg-purple-100 rounded-full flex items-center justify-center">
+                    🧑‍💻
+                </div>
+            </div>
+
+            <!-- GAMIFICATION -->
+            <div class="grid grid-cols-2 gap-3 mb-6">
+
+                <div class="bg-white border border-purple-100 rounded-2xl p-4 shadow-sm text-center">
+
+                    <span class="text-2xl">
+                        🔥
+                    </span>
+
+                    <p
+                        id="displayStreak"
+                        class="text-xl font-bold text-gray-800">
+                        4
+                    </p>
+
+                    <p class="text-[9px] font-semibold text-gray-500 uppercase tracking-wider">
+                        Hari Streak
+                    </p>
+                </div>
+
+                <div class="bg-gradient-to-br from-purple-500 to-purple-700 rounded-2xl p-4 shadow-md text-center text-white">
+
+                    <span class="text-2xl">
+                        ⭐
+                    </span>
+
+                    <p
+                        id="displayHP"
+                        class="text-xl font-bold">
+                        120
+                    </p>
+
+                    <p class="text-[9px] font-semibold text-purple-200 uppercase tracking-wider">
+                        Health Points
+                    </p>
+                </div>
+
+            </div>
+
+            <!-- WEEKLY CHALLENGE -->
+            <div class="flex justify-between items-center mb-3">
+
+                <h3 class="section-title">
+                    Tantangan Mingguan
+                </h3>
+
+                <span class="text-[9px] text-purple-600 font-bold">
+                    +50 HP
+                </span>
+            </div>
+
+            <div class="bg-white border border-gray-200 rounded-2xl p-4 shadow-sm mb-6">
+
+                <div class="flex justify-between items-center mb-2">
+
+                    <span class="text-xs font-bold">
+                        Catat 5 pilihan sehat
+                    </span>
+
+                    <span class="text-[9px] bg-purple-50 text-purple-700 px-2 py-1 rounded">
+                        3/5
+                    </span>
+
+                </div>
+
+                <div class="bar">
+                    <div
+                        class="bg-purple-500"
+                        style="width:60%">
+                    </div>
+                </div>
+
+                <p class="text-[9px] text-gray-500 text-right mt-2">
+                    Dua pencatatan lagi untuk menyelesaikan tantangan.
+                </p>
+            </div>
+
+            <!-- MAIN FEATURES -->
+            <div class="grid grid-cols-2 gap-3 mb-6">
+
+                <button
+                    onclick="navigate('scan','nav-scan')"
+                    class="bg-purple-50 border border-purple-200 rounded-2xl p-4 text-center hover:bg-purple-100 transition">
+
+                    <div class="w-11 h-11 mx-auto bg-purple-200 rounded-full flex items-center justify-center text-xl mb-2">
+                        📸
+                    </div>
+
+                    <span class="font-semibold text-xs text-purple-900">
+                        Scan Pangan
+                    </span>
+
+                    <p class="text-[8px] text-purple-700 mt-1">
+                        Computer Vision AI
+                    </p>
+                </button>
+
+
+                <button
+                    onclick="navigate('profile','nav-profile')"
+                    class="bg-white border border-purple-100 rounded-2xl p-4 text-center hover:bg-gray-50">
+
+                    <div class="w-11 h-11 mx-auto bg-purple-100 rounded-full flex items-center justify-center text-xl mb-2">
+                        📊
+                    </div>
+
+                    <span class="font-semibold text-xs text-purple-900">
+                        Pola 7 Hari
+                    </span>
+
+                    <p class="text-[8px] text-gray-500 mt-1">
+                        Behavior Profile
+                    </p>
+                </button>
+
+            </div>
+
+            <!-- QUICK STATUS -->
+            <div class="bg-white border border-gray-200 rounded-2xl p-4 shadow-sm">
+
+                <div class="flex justify-between items-center mb-3">
+
+                    <h3 class="font-bold text-xs">
+                        Status Kebiasaan
+                    </h3>
+
+                    <span class="text-[9px] font-bold text-amber-700 bg-amber-50 px-2 py-1 rounded-lg">
+                        Perlu Perhatian
+                    </span>
+
+                </div>
+
+                <div class="space-y-3">
+
+                    <div class="flex items-center gap-3">
+                        <span class="text-lg">🍽️</span>
+                        <div class="flex-1">
+                            <p class="text-[10px] font-semibold">
+                                Konsumsi
+                            </p>
+                            <p class="text-[9px] text-gray-500">
+                                Minuman manis muncul beberapa kali.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-3">
+                        <span class="text-lg">🚶</span>
+                        <div class="flex-1">
+                            <p class="text-[10px] font-semibold">
+                                Aktivitas
+                            </p>
+                            <p class="text-[9px] text-gray-500">
+                                Sedentari masih cukup tinggi.
+                            </p>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="mt-5 text-center">
+                <p class="text-[9px] text-gray-400 italic">
+                    "Perubahan dapat dimulai dari satu pilihan kecil hari ini."
+                </p>
+            </div>
+
+        </div>
+
+
+        <!-- =====================================================
+             SCREEN 3 — SCAN PANGAN
+        ====================================================== -->
+        <div id="screen-scan"
+             class="hidden px-6 pt-5 pb-6 fade-in min-h-full">
+
+            <div class="flex items-center mb-5 pb-2 border-b border-purple-100">
+                <h1 class="font-serif-custom font-bold text-lg text-purple-900 flex-1 text-center">
+                    Scan Pangan
+                </h1>
+            </div>
+
+            <div
+                id="scan-placeholder"
+                class="bg-purple-50 border border-purple-200 rounded-2xl p-6 mb-5 h-60 flex flex-col items-center justify-center text-center">
+
+                <div class="w-16 h-16 rounded-2xl bg-white border border-purple-200 flex items-center justify-center text-3xl mb-4">
+                    📷
+                </div>
+
+                <p class="text-xs text-gray-700 font-medium mb-2">
+                    Kenali panganmu sebelum dikonsumsi.
+                </p>
+
+                <p class="text-[10px] text-gray-500 leading-relaxed mb-5">
+                    Computer Vision AI membantu mengenali jenis pangan
+                    dan memperkirakan porsi dari gambar.
+                </p>
+
+                <button
+                    onclick="simulateScan()"
+                    class="bg-purple-600 text-white px-6 py-3 rounded-xl text-xs font-bold shadow-md">
+                    Simulasi Scan AI
+                </button>
+
+            </div>
+
+
+            <!-- SCAN RESULT -->
+            <div id="scan-result" class="hidden">
+
+                <div class="relative w-full h-48 rounded-xl overflow-hidden mb-4 border-2 border-purple-200">
+
+                    <img
+                        src="https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=600&q=80"
+                        alt="Simulasi makanan"
+                        class="w-full h-full object-cover">
+
+                    <div class="absolute inset-0 border-2 border-purple-500 border-dashed m-4 rounded-lg"></div>
+
+                    <span class="absolute top-4 left-4 bg-purple-600 text-white text-[9px] font-bold px-2 py-1 rounded shadow">
+                        Computer Vision AI
+                    </span>
+
+                    <span class="absolute bottom-4 right-4 bg-black/60 text-white text-[9px] px-2 py-1 rounded">
+                        confidence: simulasi
+                    </span>
+
+                </div>
+
+                <div class="bg-white rounded-2xl p-4 border border-gray-200 shadow-sm mb-4">
+
+                    <p class="section-title mb-1">
+                        Hasil pengenalan
+                    </p>
+
+                    <p class="text-sm font-bold border-b border-gray-100 pb-3 mb-3">
+                        Nasi + Lauk + Minuman Manis
+                    </p>
+
+                    <div class="grid grid-cols-2 gap-3">
+
+                        <div class="mini-card bg-gray-50">
+                            <p class="text-[9px] text-gray-500">
+                                Jenis pangan
+                            </p>
+                            <p class="text-[11px] font-bold mt-1">
+                                Campuran
+                            </p>
+                        </div>
+
+                        <div class="mini-card bg-gray-50">
+                            <p class="text-[9px] text-gray-500">
+                                Estimasi porsi
+                            </p>
+                            <p class="text-[11px] font-bold mt-1">
+                                1 porsi
+                            </p>
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="bg-amber-50 border border-amber-200 rounded-xl p-3 mb-5">
+
+                    <p class="text-[9px] text-amber-800 leading-relaxed">
+                        <strong>Catatan:</strong> hasil pengenalan dan estimasi
+                        porsi merupakan estimasi visual. Teknologi tetap perlu
+                        divalidasi terhadap beragam makanan rumahan, jajanan,
+                        makanan lokal, dan minuman yang umum dikonsumsi remaja
+                        Indonesia.
+                    </p>
+
+                </div>
+
+                <button
+                    onclick="saveScan()"
+                    class="w-full bg-purple-600 text-white font-bold py-3.5 rounded-xl text-xs shadow-sm">
+                    Simpan ke Profil Perilaku
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <!-- =====================================================
+             SCREEN 4 — PROFILE
+        ====================================================== -->
+        <div id="screen-profile"
+             class="hidden px-6 pt-5 pb-6 fade-in min-h-full">
+
+            <div class="flex items-center mb-4 pb-2 border-b border-purple-100">
+
+                <h1 class="font-serif-custom italic font-bold text-lg text-purple-900 flex-1 text-center">
+                    Metabolic Behavior Profile
+                </h1>
+
+            </div>
+
+            <p class="text-[10px] text-gray-600 text-center mb-5">
+                Ringkasan pola kebiasaan berdasarkan data pangan dan aktivitas.
+            </p>
+
+
+            <!-- 7 DAY PATTERN -->
+            <div class="bg-white border border-gray-200 rounded-2xl p-4 shadow-sm mb-4">
+
+                <div class="flex justify-between items-center mb-3">
+
+                    <h3 class="font-bold text-xs">
+                        Pola 7 Hari
+                    </h3>
+
+                    <span class="text-[9px] text-purple-600 font-bold">
+                        Data simulasi
+                    </span>
+
+                </div>
+
+                <div class="flex justify-between items-end h-24 gap-2">
+
+                    <div class="flex-1 flex flex-col items-center gap-1">
+                        <div class="w-full bg-purple-100 rounded-t-lg" style="height:45%"></div>
+                        <span class="text-[8px] text-gray-400">S</span>
+                    </div>
+
+                    <div class="flex-1 flex flex-col items-center gap-1">
+                        <div class="w-full bg-purple-200 rounded-t-lg" style="height:65%"></div>
+                        <span class="text-[8px] text-gray-400">S</span>
+                    </div>
+
+                    <div class="flex-1 flex flex-col items-center gap-1">
+                        <div class="w-full bg-purple-300 rounded-t-lg" style="height:55%"></div>
+                        <span class="text-[8px] text-gray-400">R</span>
+                    </div>
+
+                    <div class="flex-1 flex flex-col items-center gap-1">
+                        <div class="w-full bg-purple-400 rounded-t-lg" style="height:78%"></div>
+                        <span class="text-[8px] text-gray-400">K</span>
+                    </div>
+
+                    <div class="flex-1 flex flex-col items-center gap-1">
+                        <div class="w-full bg-purple-300 rounded-t-lg" style="height:60%"></div>
+                        <span class="text-[8px] text-gray-400">J</span>
+                    </div>
+
+                    <div class="flex-1 flex flex-col items-center gap-1">
+                        <div class="w-full bg-purple-200 rounded-t-lg" style="height:48%"></div>
+                        <span class="text-[8px] text-gray-400">S</span>
+                    </div>
+
+                    <div class="flex-1 flex flex-col items-center gap-1">
+                        <div class="w-full bg-purple-500 rounded-t-lg" style="height:72%"></div>
+                        <span class="text-[8px] text-gray-400">M</span>
+                    </div>
+
+                </div>
+
+                <p class="text-[8px] text-gray-400 mt-3 text-center">
+                    Visualisasi intensitas pola pencatatan, bukan nilai gula darah.
+                </p>
+
+            </div>
+
+
+            <!-- ACTIVITY -->
+            <div class="bg-white border border-gray-200 rounded-2xl p-4 shadow-sm mb-4">
+
+                <h3 class="font-bold text-xs mb-3 flex justify-between">
+                    Data Aktivitas
+                    <span class="text-[9px] text-blue-600 bg-blue-50 px-2 py-1 rounded-full">
+                        Sync API
+                    </span>
+                </h3>
+
+                <div class="grid grid-cols-2 gap-3">
+
+                    <div class="bg-gray-50 p-3 rounded-xl">
+
+                        <p class="text-[8px] text-gray-500 uppercase font-semibold">
+                            Langkah
+                        </p>
+
+                        <p class="text-sm font-bold mt-1">
+                            4.520
+                        </p>
+
+                        <p class="text-[8px] text-gray-400">
+                            langkah/hari
+                        </p>
+
+                        <div class="bar mt-2">
+                            <div
+                                class="bg-blue-500"
+                                style="width:45%">
+                            </div>
+                        </div>
+
+                    </div>
+
+
+                    <div class="bg-gray-50 p-3 rounded-xl">
+
+                        <p class="text-[8px] text-gray-500 uppercase font-semibold">
+                            Sedentari
+                        </p>
+
+                        <p class="text-sm font-bold text-amber-600 mt-1">
+                            7 jam
+                        </p>
+
+                        <p class="text-[8px] text-gray-400">
+                            hari ini
+                        </p>
+
+                        <div class="bar mt-2">
+                            <div
+                                class="bg-amber-500"
+                                style="width:70%">
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- STATUS -->
+            <div class="bg-purple-50 border border-purple-200 rounded-xl p-4 mb-4">
+
+                <div class="flex justify-between items-center">
+
+                    <div>
+                        <h3 class="font-bold text-xs">
+                            Status Pola Perilaku
+                        </h3>
+
+                        <p class="text-[9px] text-gray-500 mt-1">
+                            Perbaikan dilakukan secara bertahap.
+                        </p>
+                    </div>
+
+                    <span class="text-[9px] font-bold text-amber-700 bg-amber-100 px-3 py-1.5 rounded-lg border border-amber-200">
+                        Perlu Perhatian
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <!-- PATTERN -->
+            <div class="space-y-3 mb-5">
+
+                <div class="bg-white border border-gray-200 rounded-xl p-3 flex gap-3 items-center">
+
+                    <div class="text-xl bg-gray-50 p-2 rounded-full">
+                        🍽️
+                    </div>
+
+                    <div>
+                        <h3 class="font-bold text-[11px]">
+                            Pola Konsumsi
+                        </h3>
+
+                        <p class="text-[9px] text-gray-500 leading-relaxed">
+                            Minuman tinggi gula dan makanan ultra-proses
+                            muncul beberapa kali.
+                        </p>
+                    </div>
+
+                </div>
+
+
+                <div class="bg-white border border-gray-200 rounded-xl p-3 flex gap-3 items-center">
+
+                    <div class="text-xl bg-gray-50 p-2 rounded-full">
+                        🚶
+                    </div>
+
+                    <div>
+                        <h3 class="font-bold text-[11px]">
+                            Pola Aktivitas
+                        </h3>
+
+                        <p class="text-[9px] text-gray-500 leading-relaxed">
+                            Langkah harian belum optimal dan durasi
+                            sedentari cukup tinggi.
+                        </p>
+                    </div>
+
+                </div>
+
+
+                <div class="bg-white border border-gray-200 rounded-xl p-3 flex gap-3 items-center">
+
+                    <div class="text-xl bg-gray-50 p-2 rounded-full">
+                        🔄
+                    </div>
+
+                    <div>
+                        <h3 class="font-bold text-[11px]">
+                            Konsistensi Kebiasaan
+                        </h3>
+
+                        <p class="text-[9px] text-gray-500 leading-relaxed">
+                            Penerapan pola sehat masih berfluktuasi.
+                        </p>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="bg-gray-100 rounded-xl p-3 border border-gray-200 text-center">
+
+                <p class="text-[9px] text-gray-500 italic leading-relaxed">
+                    Kategori ini bukan diagnosis atau skor risiko klinis.
+                    Fungsinya membantu remaja mengenali pola perilaku
+                    sehari-hari.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <!-- =====================================================
+             SCREEN 5 — ADAPTIVE MICRO-NUDGE
+        ====================================================== -->
+        <div id="screen-nudge"
+             class="hidden px-6 pt-5 pb-6 fade-in min-h-full">
+
+            <div class="flex items-center mb-5 pb-2 border-b border-purple-100">
+
+                <h1 class="font-serif-custom italic font-bold text-lg text-purple-900 flex-1 text-center">
+                    Adaptive Micro-Nudge
+                </h1>
+
+            </div>
+
+
+            <!-- FEEDBACK -->
+            <div class="bg-purple-50 rounded-2xl p-5 mb-5 border border-purple-200 shadow-sm">
+
+                <div class="flex items-center gap-2 mb-3">
+
+                    <span class="w-8 h-8 rounded-full bg-white flex items-center justify-center">
+                        💡
+                    </span>
+
+                    <h3 class="font-bold text-xs text-purple-900">
+                        Umpan Balik Preventif
+                    </h3>
+
+                </div>
+
+                <p class="text-xs text-purple-900 leading-relaxed font-medium">
+                    Beberapa pilihan minuman hari ini mengandung gula
+                    tambahan dan waktu sedentari cukup tinggi. Untuk pilihan
+                    berikutnya, coba ukuran lebih kecil atau minuman tanpa
+                    tambahan gula.
+                </p>
+
+            </div>
+
+
+            <!-- WHY -->
+            <div class="bg-white border border-gray-200 rounded-2xl p-4 mb-5">
+
+                <p class="section-title mb-3">
+                    Mengapa saran ini muncul?
+                </p>
+
+                <div class="space-y-2">
+
+                    <div class="flex items-center gap-2 text-[9px]">
+                        <span>🥤</span>
+                        <span class="text-gray-600">
+                            Minuman tinggi gula tercatat beberapa kali
+                        </span>
+                    </div>
+
+                    <div class="flex items-center gap-2 text-[9px]">
+                        <span>🪑</span>
+                        <span class="text-gray-600">
+                            Sedentari hari ini relatif tinggi
+                        </span>
+                    </div>
+
+                    <div class="flex items-center gap-2 text-[9px]">
+                        <span>🔄</span>
+                        <span class="text-gray-600">
+                            Sistem memilih perubahan yang sederhana
+                        </span>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- SMART SWAPPING -->
+            <h3 class="section-title mb-3">
+                Smart Swapping
+            </h3>
+
+            <div class="bg-white border border-gray-200 rounded-2xl p-5 shadow-sm text-center mb-5">
+
+                <div class="flex items-center justify-between px-2 mb-5">
+
+                    <div class="flex flex-col items-center">
+
+                        <div class="w-14 h-14 bg-gray-50 rounded-full flex items-center justify-center text-3xl border border-gray-100">
+                            🧋
+                        </div>
+
+                        <span class="text-[9px] text-gray-500 font-medium w-20 mt-2">
+                            Minuman manis
+                        </span>
+
+                    </div>
+
+                    <span class="text-2xl text-purple-500 font-bold">
+                        →
+                    </span>
+
+                    <div class="flex flex-col items-center">
+
+                        <div class="w-14 h-14 bg-purple-50 rounded-full flex items-center justify-center text-3xl border border-purple-200">
+                            💧
+                        </div>
+
+                        <span class="text-[9px] text-gray-800 font-bold w-20 mt-2">
+                            Tanpa tambahan gula
+                        </span>
+
+                    </div>
+
+                </div>
+
+                <p class="text-[9px] text-gray-500 leading-relaxed mb-4">
+                    Alternatif diberikan sebagai pilihan, bukan larangan.
+                    Keputusan akhir tetap berada pada pengguna.
+                </p>
+
+                <button
+                    id="btnReward"
+                    onclick="claimReward()"
+                    class="w-full bg-purple-100 hover:bg-purple-200 text-purple-900 font-bold py-3.5 rounded-xl transition text-xs shadow-sm">
+
+                    Terapkan Pilihan Ini
+                    <span class="bg-purple-500 text-white px-2 py-0.5 rounded text-[9px]">
+                        +25 HP
+                    </span>
+
+                </button>
+
+            </div>
+
+
+            <!-- OTHER NUDGE -->
+            <div class="bg-white border border-gray-200 rounded-2xl p-4 mb-5">
+
+                <p class="section-title mb-3">
+                    Contoh nudge adaptif
+                </p>
+
+                <div class="space-y-3">
+
+                    <div class="flex gap-3">
+                        <span class="text-lg">🚶</span>
+
+                        <div>
+                            <p class="text-[10px] font-bold">
+                                Jika sedentari tinggi
+                            </p>
+
+                            <p class="text-[9px] text-gray-500">
+                                "Coba sisipkan beberapa menit aktivitas ringan
+                                di antara rutinitas dudukmu."
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="flex gap-3">
+                        <span class="text-lg">🍽️</span>
+
+                        <div>
+                            <p class="text-[10px] font-bold">
+                                Jika pola pangan berulang
+                            </p>
+
+                            <p class="text-[9px] text-gray-500">
+                                Sistem menawarkan alternatif yang lebih realistis
+                                berdasarkan pilihan sebelumnya.
+                            </p>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- MEDICAL FOLLOW UP -->
+            <div id="skrining-box"
+                 class="hidden bg-red-50 border border-red-200 rounded-2xl p-5 text-center fade-in">
+
+                <h4 class="text-xs font-bold text-red-800 mb-2">
+                    ⚠️ Pengingat Tindak Lanjut
+                </h4>
+
+                <p class="text-[9px] text-red-700 leading-relaxed mb-4">
+                    Pola perilaku yang perlu diperhatikan muncul berulang.
+                    Sistem menyarankan pengguna mempertimbangkan pemeriksaan
+                    kesehatan di fasilitas kesehatan.
+                </p>
+
+                <button
+                    onclick="showToast('Simulasi: diarahkan ke layanan kesehatan SATUSEHAT')"
+                    class="text-[10px] font-bold text-white bg-red-600 px-5 py-2.5 rounded-xl w-full">
+
+                    Pertimbangkan Pemeriksaan
+                </button>
+
+                <p class="text-[8px] text-red-500 mt-3">
+                    Pemeriksaan, interpretasi hasil, diagnosis, dan keputusan
+                    medis dilakukan oleh tenaga kesehatan.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <!-- =====================================================
+             SCREEN 6 — SISTEM / IMPLEMENTASI
+        ====================================================== -->
+        <div id="screen-user"
+             class="hidden px-6 pt-5 pb-6 fade-in min-h-full">
+
+            <div class="flex items-center mb-5 pb-2 border-b border-purple-100">
+
+                <h1 class="font-serif-custom font-bold text-lg text-purple-900 flex-1 text-center">
+                    Sistem & Implementasi
+                </h1>
+
+            </div>
+
+
+            <!-- ROLE -->
+            <div class="bg-white border border-gray-200 rounded-2xl p-4 mb-4">
+
+                <p class="section-title mb-3">
+                    Posisi Sistem
+                </p>
+
+                <p class="text-[10px] text-gray-600 leading-relaxed">
+                    METABOLICBUDDY 5.0 merupakan modul pendamping preventif
+                    yang dirancang untuk melengkapi ekosistem SATUSEHAT.
+                    Sistem membantu pengguna mengenali pola perilaku, bukan
+                    menggantikan pemeriksaan medis.
+                </p>
+
+            </div>
+
+
+            <!-- PENTAHELIX -->
+            <div class="bg-white border border-gray-200 rounded-2xl p-4 mb-4">
+
+                <p class="section-title mb-3">
+                    Model Kolaborasi Pentahelix
+                </p>
+
+                <div class="grid grid-cols-2 gap-2">
+
+                    <div class="bg-purple-50 border border-purple-100 rounded-xl p-3">
+                        <p class="text-lg">🏛️</p>
+                        <p class="text-[10px] font-bold mt-1">
+                            Pemerintah
+                        </p>
+                        <p class="text-[8px] text-gray-500 mt-1">
+                            Regulasi, tata kelola, integrasi SATUSEHAT
+                        </p>
+                    </div>
+
+                    <div class="bg-blue-50 border border-blue-100 rounded-xl p-3">
+                        <p class="text-lg">🎓</p>
+                        <p class="text-[10px] font-bold mt-1">
+                            Akademisi
+                        </p>
+                        <p class="text-[8px] text-gray-500 mt-1">
+                            Validasi indikator dan evaluasi
+                        </p>
+                    </div>
+
+                    <div class="bg-green-50 border border-green-100 rounded-xl p-3">
+                        <p class="text-lg">🩺</p>
+                        <p class="text-[10px] font-bold mt-1">
+                            Tenaga Ahli
+                        </p>
+                        <p class="text-[8px] text-gray-500 mt-1">
+                            Gizi, kesehatan, psikologi perilaku
+                        </p>
+                    </div>
+
+                    <div class="bg-amber-50 border border-amber-100 rounded-xl p-3">
+                        <p class="text-lg">💻</p>
+                        <p class="text-[10px] font-bold mt-1">
+                            Industri
+                        </p>
+                        <p class="text-[8px] text-gray-500 mt-1">
+                            AI, keamanan data, interoperabilitas
+                        </p>
+                    </div>
+
+                    <div class="bg-pink-50 border border-pink-100 rounded-xl p-3 col-span-2">
+                        <p class="text-lg">🏫</p>
+                        <p class="text-[10px] font-bold mt-1">
+                            Sekolah, Kampus & Komunitas
+                        </p>
+                        <p class="text-[8px] text-gray-500 mt-1">
+                            Uji coba, literasi kesehatan, dan penerimaan pengguna
+                        </p>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- ROADMAP -->
+            <div class="bg-white border border-gray-200 rounded-2xl p-4 mb-4">
+
+                <p class="section-title mb-3">
+                    Roadmap Implementasi
+                </p>
+
+                <div class="space-y-4">
+
+                    <div class="flex gap-3">
+
+                        <div class="w-7 h-7 rounded-full bg-purple-100 text-purple-700 flex items-center justify-center text-[9px] font-bold">
+                            01
+                        </div>
+
+                        <div>
+                            <p class="text-[10px] font-bold">
+                                Bulan 0–6
+                            </p>
+
+                            <p class="text-[9px] text-gray-500 leading-relaxed">
+                                Dataset pangan Indonesia, pengembangan
+                                Computer Vision AI, Metabolic Behavior Profile,
+                                dan rancangan Adaptive Micro-Nudge.
+                            </p>
+                        </div>
+
+                    </div>
+
+
+                    <div class="flex gap-3">
+
+                        <div class="w-7 h-7 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center text-[9px] font-bold">
+                            02
+                        </div>
+
+                        <div>
+                            <p class="text-[10px] font-bold">
+                                Bulan 6–12
+                            </p>
+
+                            <p class="text-[9px] text-gray-500 leading-relaxed">
+                                Uji terbatas terhadap akurasi pengenalan pangan,
+                                estimasi porsi, usability, keterbacaan pesan,
+                                keterlibatan pengguna, dan keamanan data.
+                            </p>
+                        </div>
+
+                    </div>
+
+
+                    <div class="flex gap-3">
+
+                        <div class="w-7 h-7 rounded-full bg-green-100 text-green-700 flex items-center justify-center text-[9px] font-bold">
+                            03
+                        </div>
+
+                        <div>
+                            <p class="text-[10px] font-bold">
+                                Tahun Kedua
+                            </p>
+
+                            <p class="text-[9px] text-gray-500 leading-relaxed">
+                                Perluasan integrasi SATUSEHAT secara bertahap
+                                berdasarkan hasil evaluasi.
+                            </p>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- DOWNLOAD -->
+            <div class="bg-purple-50 border border-purple-200 rounded-2xl p-4 text-center">
+
+                <div class="text-2xl mb-2">
+                    📥
+                </div>
+
+                <h3 class="font-bold text-xs text-purple-900">
+                    Diagram Mekanisme
+                </h3>
+
+                <p class="text-[9px] text-purple-800 mt-1 mb-4">
+                    Visualisasi Gambar 1 pada naskah esai.
+                </p>
+
+                <div class="flex gap-2">
+
+                    <button
+                        onclick="downloadDiagram('svg')"
+                        class="flex-1 bg-white text-purple-800 py-2.5 rounded-xl text-[9px] font-bold border border-purple-200">
+                        Unduh SVG
+                    </button>
+
+                    <button
+                        onclick="downloadDiagram('png')"
+                        class="flex-1 bg-purple-600 text-white py-2.5 rounded-xl text-[9px] font-bold">
+                        Unduh PNG
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- =====================================================
+             SCREEN 7 — KPI / EVALUASI
+        ====================================================== -->
+        <div id="screen-evaluation"
+             class="hidden px-6 pt-5 pb-6 fade-in min-h-full">
+
+            <div class="flex items-center mb-5 pb-2 border-b border-purple-100">
+
+                <h1 class="font-serif-custom font-bold text-lg text-purple-900 flex-1 text-center">
+                    Evaluasi & KPI
+                </h1>
+
+            </div>
+
+            <p class="text-[10px] text-gray-600 text-center mb-5">
+                Indikator digunakan untuk menilai kelayakan teknologi,
+                penerimaan pengguna, dan potensi perubahan perilaku.
+            </p>
+
+
+            <div class="space-y-3">
+
+                <div class="bg-white border border-gray-200 rounded-2xl p-4">
+                    <div class="flex justify-between">
+                        <p class="text-[10px] font-bold">
+                            Akurasi Computer Vision
+                        </p>
+                        <span class="text-[9px] text-purple-600 font-bold">
+                            Teknologi
+                        </span>
+                    </div>
+                    <p class="text-[9px] text-gray-500 mt-1">
+                        Ketepatan pengenalan jenis pangan dan estimasi porsi.
+                    </p>
+                </div>
+
+
+                <div class="bg-white border border-gray-200 rounded-2xl p-4">
+                    <div class="flex justify-between">
+                        <p class="text-[10px] font-bold">
+                            Kemudahan Penggunaan
+                        </p>
+                        <span class="text-[9px] text-blue-600 font-bold">
+                            UX
+                        </span>
+                    </div>
+                    <p class="text-[9px] text-gray-500 mt-1">
+                        Kemudahan pengguna memahami dan menggunakan fitur.
+                    </p>
+                </div>
+
+
+                <div class="bg-white border border-gray-200 rounded-2xl p-4">
+                    <div class="flex justify-between">
+                        <p class="text-[10px] font-bold">
+                            Keterlibatan Pengguna
+                        </p>
+                        <span class="text-[9px] text-green-600 font-bold">
+                            Engagement
+                        </span>
+                    </div>
+                    <p class="text-[9px] text-gray-500 mt-1">
+                        Frekuensi pencatatan, penyelesaian tantangan,
+                        dan penggunaan fitur.
+                    </p>
+                </div>
+
+
+                <div class="bg-white border border-gray-200 rounded-2xl p-4">
+                    <div class="flex justify-between">
+                        <p class="text-[10px] font-bold">
+                            Konsistensi Kebiasaan
+                        </p>
+                        <span class="text-[9px] text-amber-600 font-bold">
+                            Behavior
+                        </span>
+                    </div>
+                    <p class="text-[9px] text-gray-500 mt-1">
+                        Perubahan pola pilihan pangan dan aktivitas dari waktu
+                        ke waktu.
+                    </p>
+                </div>
+
+
+                <div class="bg-white border border-gray-200 rounded-2xl p-4">
+                    <div class="flex justify-between">
+                        <p class="text-[10px] font-bold">
+                            Keamanan Data
+                        </p>
+                        <span class="text-[9px] text-red-600 font-bold">
+                            Safety
+                        </span>
+                    </div>
+                    <p class="text-[9px] text-gray-500 mt-1">
+                        Tidak adanya insiden keamanan serta kesesuaian
+                        pengelolaan dan interoperabilitas data.
+                    </p>
+                </div>
+
+            </div>
+
+
+            <div class="mt-5 bg-gray-100 border border-gray-200 rounded-2xl p-4">
+
+                <p class="section-title mb-2">
+                    Prinsip evaluasi
+                </p>
+
+                <p class="text-[9px] text-gray-500 leading-relaxed">
+                    Evaluasi tidak hanya berfokus pada performa AI, tetapi juga
+                    pada keterpahaman pesan, penerimaan pengguna, keamanan,
+                    dan kemungkinan perubahan kebiasaan.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <!-- =====================================================
+             SCREEN 8 — SWOT
+        ====================================================== -->
+        <div id="screen-swot"
+             class="hidden px-6 pt-5 pb-6 fade-in min-h-full">
+
+            <div class="flex items-center mb-5 pb-2 border-b border-purple-100">
+
+                <h1 class="font-serif-custom font-bold text-lg text-purple-900 flex-1 text-center">
+                    Analisis SWOT
+                </h1>
+
+            </div>
+
+
+            <div class="grid grid-cols-2 gap-3">
+
+                <div class="bg-green-50 border border-green-200 rounded-2xl p-4">
+                    <p class="text-xl">💪</p>
+                    <h3 class="text-xs font-bold text-green-800 mt-2">
+                        Strengths
+                    </h3>
+
+                    <ul class="text-[8px] text-gray-600 mt-2 space-y-2 list-disc pl-3">
+                        <li>Terintegrasi dengan ekosistem kesehatan digital.</li>
+                        <li>Memadukan pangan dan aktivitas.</li>
+                        <li>Umpan balik adaptif dan realistis.</li>
+                        <li>Gamifikasi meningkatkan keterlibatan.</li>
+                    </ul>
+                </div>
+
+
+                <div class="bg-red-50 border border-red-200 rounded-2xl p-4">
+                    <p class="text-xl">⚠️</p>
+                    <h3 class="text-xs font-bold text-red-800 mt-2">
+                        Weaknesses
+                    </h3>
+
+                    <ul class="text-[8px] text-gray-600 mt-2 space-y-2 list-disc pl-3">
+                        <li>Akurasi AI belum sempurna.</li>
+                        <li>Estimasi porsi berbasis gambar memiliki keterbatasan.</li>
+                        <li>Bergantung pada konsistensi pencatatan.</li>
+                    </ul>
+                </div>
+
+
+                <div class="bg-blue-50 border border-blue-200 rounded-2xl p-4">
+                    <p class="text-xl">🌱</p>
+                    <h3 class="text-xs font-bold text-blue-800 mt-2">
+                        Opportunities
+                    </h3>
+
+                    <ul class="text-[8px] text-gray-600 mt-2 space-y-2 list-disc pl-3">
+                        <li>Penguatan transformasi kesehatan digital.</li>
+                        <li>Perkembangan AI dan computer vision.</li>
+                        <li>Kolaborasi sekolah, kampus, dan komunitas.</li>
+                    </ul>
+                </div>
+
+
+                <div class="bg-amber-50 border border-amber-200 rounded-2xl p-4">
+                    <p class="text-xl">🛡️</p>
+                    <h3 class="text-xs font-bold text-amber-800 mt-2">
+                        Threats
+                    </h3>
+
+                    <ul class="text-[8px] text-gray-600 mt-2 space-y-2 list-disc pl-3">
+                        <li>Privasi dan keamanan data.</li>
+                        <li>Bias dataset pangan.</li>
+                        <li>Potensi salah interpretasi sebagai diagnosis.</li>
+                        <li>Kesenjangan akses digital.</li>
+                    </ul>
+                </div>
+
+            </div>
+
+
+            <div class="mt-5 bg-purple-50 border border-purple-200 rounded-2xl p-4">
+
+                <p class="text-[9px] text-purple-900 leading-relaxed">
+                    <strong>Implikasi:</strong> pengembangan perlu dilakukan
+                    bertahap melalui validasi teknologi, pelibatan ahli,
+                    pengujian pengguna, penguatan keamanan data, dan evaluasi
+                    berkala sebelum diperluas.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <!-- =====================================================
+             SCREEN 9 — REFERENCES / ABOUT
+        ====================================================== -->
+        <div id="screen-about"
+             class="hidden px-6 pt-5 pb-6 fade-in min-h-full">
+
+            <div class="flex items-center mb-5 pb-2 border-b border-purple-100">
+
+                <h1 class="font-serif-custom font-bold text-lg text-purple-900 flex-1 text-center">
+                    Tentang Purwarupa
+                </h1>
+
+            </div>
+
+
+            <div class="bg-purple-50 border border-purple-200 rounded-2xl p-4 mb-5">
+
+                <h3 class="font-bold text-xs text-purple-900">
+                    METABOLICBUDDY 5.0
+                </h3>
+
+                <p class="text-[9px] text-purple-800 leading-relaxed mt-2">
+                    Integrasi <i>Metabolic Behavior Profiling</i> dan
+                    <i>Adaptive Micro-Nudge</i> guna memitigasi risiko
+                    diabetes remaja.
+                </p>
+
+                <p class="text-[8px] text-gray-500 mt-3">
+                    Konsep dikembangkan sebagai gagasan inovasi teknologi
+                    dalam Lomba Esai Ilmiah Nasional LEGIS SPACE 6.0.
+                </p>
+
+            </div>
+
+
+            <div class="bg-white border border-gray-200 rounded-2xl p-4 mb-4">
+
+                <p class="section-title mb-3">
+                    Prinsip desain
+                </p>
+
+                <div class="space-y-3">
+
+                    <div class="flex gap-3">
+                        <span>1️⃣</span>
+                        <p class="text-[9px] text-gray-600">
+                            Preventif, bukan diagnostik.
+                        </p>
+                    </div>
+
+                    <div class="flex gap-3">
+                        <span>2️⃣</span>
+                        <p class="text-[9px] text-gray-600">
+                            Informasi tanpa menghakimi.
+                        </p>
+                    </div>
+
+                    <div class="flex gap-3">
+                        <span>3️⃣</span>
+                        <p class="text-[9px] text-gray-600">
+                            Pilihan pengguna tetap menjadi pusat keputusan.
+                        </p>
+                    </div>
+
+                    <div class="flex gap-3">
+                        <span>4️⃣</span>
+                        <p class="text-[9px] text-gray-600">
+                            AI digunakan sebagai pendamping pengenalan pola.
+                        </p>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="bg-gray-100 border border-gray-200 rounded-2xl p-4">
+
+                <p class="section-title mb-3">
+                    Referensi utama
+                </p>
+
+                <div class="space-y-3 text-[8px] text-gray-500 leading-relaxed">
+
+                    <p>
+                        Chotwanvirat et al. (2024). Advancements in using AI
+                        for dietary assessment based on food images.
+                        <i>Journal of Medical Internet Research, 26</i>.
+                    </p>
+
+                    <p>
+                        Dalakleidi et al. (2022). Applying image-based
+                        food-recognition systems on dietary assessment:
+                        A systematic review.
+                        <i>Advances in Nutrition, 13</i>(6), 2590–2619.
+                    </p>
+
+                    <p>
+                        Kementerian Kesehatan Republik Indonesia. (2023).
+                        <i>Hasil utama Survei Kesehatan Indonesia 2023.</i>
+                    </p>
+
+                    <p>
+                        Lane et al. (2024). Ultra-processed food exposure
+                        and adverse health outcomes.
+                        <i>The BMJ, 384</i>.
+                    </p>
+
+                    <p>
+                        Nishi et al. (2024). Effect of digital health
+                        applications with or without gamification on physical
+                        activity and cardiometabolic risk factors.
+                        <i>EClinicalMedicine, 76</i>.
+                    </p>
+
+                    <p>
+                        Ossenbrink et al. (2023). Effectiveness of digital
+                        health interventions containing game components for
+                        self-management of type 2 diabetes.
+                        <i>JMIR Serious Games, 11</i>(1).
+                    </p>
+
+                    <p>
+                        World Health Organization. (2024).
+                        <i>Diabetes.</i>
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================================================
+         BOTTOM NAVIGATION
+    ========================================================== -->
+    <div
+        id="bottom-nav"
+        class="bg-white border-t border-gray-200 px-2 py-2 flex justify-between items-center absolute bottom-0 w-full z-50 hidden shadow-[0_-4px_10px_rgba(0,0,0,0.03)]">
+
+        <button
+            onclick="navigate('home','nav-home')"
+            id="nav-home"
+            class="nav-active flex flex-col items-center gap-1 text-gray-400 w-1/5">
+
+            <span class="text-lg">🏠</span>
+            <span class="text-[8px] font-medium">
+                Beranda
+            </span>
+
+        </button>
+
+
+        <button
+            onclick="navigate('scan','nav-scan')"
+            id="nav-scan"
+            class="flex flex-col items-center gap-1 text-gray-400 w-1/5">
+
+            <span class="text-lg">📷</span>
+            <span class="text-[8px] font-medium">
+                Scan
+            </span>
+
+        </button>
+
+
+        <button
+            onclick="navigate('profile','nav-profile')"
+            id="nav-profile"
+            class="flex flex-col items-center gap-1 text-gray-400 w-1/5">
+
+            <span class="text-lg">📊</span>
+            <span class="text-[8px] font-medium">
+                Pola
+            </span>
+
+        </button>
+
+
+        <button
+            onclick="navigate('nudge','nav-nudge')"
+            id="nav-nudge"
+            class="flex flex-col items-center gap-1 text-gray-400 w-1/5">
+
+            <span class="text-lg">💡</span>
+            <span class="text-[8px] font-medium">
+                Nudge
+            </span>
+
+        </button>
+
+
+        <button
+            onclick="navigate('user','nav-user')"
+            id="nav-user"
+            class="flex flex-col items-center gap-1 text-gray-400 w-1/5">
+
+            <span class="text-lg">⚙️</span>
+            <span class="text-[8px] font-medium">
+                Sistem
+            </span>
+
+        </button>
+
+    </div>
+
+
+    <!-- =========================================================
+         JAVASCRIPT
+    ========================================================== -->
     <script>
-        setInterval(() => {
+
+        /* =====================================================
+           CLOCK
+        ====================================================== */
+
+        function updateClock() {
+
             const now = new Date();
-            document.getElementById('clock').innerText = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
-        }, 1000);
+
+            const hours = String(now.getHours()).padStart(2,'0');
+            const minutes = String(now.getMinutes()).padStart(2,'0');
+
+            document.getElementById('clock').innerText =
+                hours + ':' + minutes;
+        }
+
+        updateClock();
+
+        setInterval(updateClock, 1000);
+
+
+        /* =====================================================
+           TOAST
+        ====================================================== */
 
         function showToast(message) {
-            const container = document.getElementById('toast-container');
-            const toast = document.createElement('div');
+
+            const container =
+                document.getElementById('toast-container');
+
+            const toast =
+                document.createElement('div');
+
             toast.className = 'toast';
             toast.innerText = message;
+
             container.appendChild(toast);
-            setTimeout(() => { toast.remove(); }, 3000);
+
+            setTimeout(() => {
+
+                toast.style.opacity = '0';
+
+                setTimeout(() => {
+                    toast.remove();
+                }, 300);
+
+            }, 2700);
         }
 
-        // Buka Modul dari SATUSEHAT Entry Point
-        function openMetabolicBuddy() {
-            document.getElementById('screen-satusehat').classList.add('hidden');
-            document.getElementById('bottom-nav').classList.remove('hidden');
-            showToast('✅ Berhasil mengaktifkan Modul METABOLICBUDDY');
-            navigate('home', 'nav-home');
+
+        /* =====================================================
+           LOGIN
+        ====================================================== */
+
+        function handleLogin() {
+
+            const input =
+                document.getElementById('loginInput');
+
+            const name =
+                input.value.trim() || 'Pengguna';
+
+            document.getElementById(
+                'displayUserNameSatuSehat'
+            ).innerText = name;
+
+            document.getElementById(
+                'displayUserName'
+            ).innerText = name;
+
+            navigate('satusehat');
+
+            showToast(
+                '✅ Masuk ke environment SATUSEHAT berhasil'
+            );
         }
+
+
+        /* =====================================================
+           OPEN MODULE
+        ====================================================== */
+
+        function openMetabolicBuddy() {
+
+            document
+                .getElementById('bottom-nav')
+                .classList.remove('hidden');
+
+            navigate('home','nav-home');
+
+            showToast(
+                '✨ Modul METABOLICBUDDY 5.0 aktif'
+            );
+        }
+
+
+        /* =====================================================
+           NAVIGATION
+        ====================================================== */
 
         function navigate(screenId, navId) {
-            ['satusehat', 'home', 'scan', 'profile', 'nudge', 'user'].forEach(s => {
-                document.getElementById('screen-' + s).classList.add('hidden');
-            });
-            document.getElementById('screen-' + screenId).classList.remove('hidden');
-            document.getElementById('app-content').scrollTo(0,0);
 
-            if(navId) {
-                ['nav-home', 'nav-scan', 'nav-profile', 'nav-nudge', 'nav-user'].forEach(n => {
-                    const el = document.getElementById(n);
-                    if(el) { el.classList.remove('nav-active'); el.style.transform = "scale(1)"; el.style.color = "#9CA3AF"; }
-                });
-                const activeEl = document.getElementById(navId);
-                if(activeEl) { activeEl.classList.add('nav-active'); activeEl.style.transform = "scale(1.1)"; activeEl.style.color = "var(--mb-primary)"; }
+            const screens = [
+                'login',
+                'satusehat',
+                'home',
+                'scan',
+                'profile',
+                'nudge',
+                'user',
+                'evaluation',
+                'swot',
+                'about'
+            ];
+
+            screens.forEach(screen => {
+
+                const element =
+                    document.getElementById(
+                        'screen-' + screen
+                    );
+
+                if (element) {
+                    element.classList.add('hidden');
+                }
+
+            });
+
+
+            const target =
+                document.getElementById(
+                    'screen-' + screenId
+                );
+
+            if (target) {
+                target.classList.remove('hidden');
+                target.classList.add('fade-in');
             }
+
+
+            const content =
+                document.getElementById('app-content');
+
+            if (content) {
+                content.scrollTo({
+                    top: 0,
+                    behavior: 'instant'
+                });
+            }
+
+
+            if (navId) {
+
+                const navs = [
+                    'nav-home',
+                    'nav-scan',
+                    'nav-profile',
+                    'nav-nudge',
+                    'nav-user'
+                ];
+
+                navs.forEach(id => {
+
+                    const nav =
+                        document.getElementById(id);
+
+                    if (nav) {
+
+                        nav.classList.remove(
+                            'nav-active'
+                        );
+
+                        nav.style.transform =
+                            'scale(1)';
+
+                        nav.style.color =
+                            '#9CA3AF';
+                    }
+
+                });
+
+
+                const active =
+                    document.getElementById(navId);
+
+                if (active) {
+
+                    active.classList.add(
+                        'nav-active'
+                    );
+
+                    active.style.transform =
+                        'scale(1.08)';
+
+                    active.style.color =
+                        'var(--primary-purple)';
+                }
+
+            }
+
         }
+
+
+        /* =====================================================
+           SCAN AI
+        ====================================================== */
 
         function simulateScan() {
-            const btn = document.querySelector('#scan-placeholder button');
-            btn.innerText = "Computer Vision AI memproses...";
-            btn.classList.add('opacity-70', 'cursor-not-allowed');
+
+            const button =
+                document.querySelector(
+                    '#scan-placeholder button'
+                );
+
+            if (button) {
+
+                button.innerText =
+                    'Computer Vision AI memproses...';
+
+                button.disabled = true;
+                button.classList.add(
+                    'opacity-70'
+                );
+            }
+
+
+            showToast(
+                '🔍 Menganalisis gambar pangan...'
+            );
+
+
             setTimeout(() => {
-                document.getElementById('scan-placeholder').classList.add('hidden');
-                document.getElementById('scan-result').classList.remove('hidden');
-                showToast('🔍 Estimasi porsi & identifikasi pangan berhasil');
-            }, 1200); 
+
+                document
+                    .getElementById('scan-placeholder')
+                    .classList.add('hidden');
+
+                document
+                    .getElementById('scan-result')
+                    .classList.remove('hidden');
+
+                showToast(
+                    '✅ Jenis pangan berhasil dikenali'
+                );
+
+            }, 1400);
+
         }
+
+
+        /* =====================================================
+           SAVE SCAN
+        ====================================================== */
 
         function saveScan() {
-            showToast('📊 Data digabung dengan riwayat Aktivitas');
-            setTimeout(() => { navigate('profile', 'nav-profile'); }, 1500);
+
+            showToast(
+                '📊 Memperbarui Metabolic Behavior Profile...'
+            );
+
+            setTimeout(() => {
+
+                navigate(
+                    'profile',
+                    'nav-profile'
+                );
+
+            }, 1100);
+
         }
+
+
+        /* =====================================================
+           GAMIFICATION
+        ====================================================== */
 
         let isClaimed = false;
+
         function claimReward() {
-            if (isClaimed) return;
+
+            if (isClaimed) {
+                return;
+            }
+
             isClaimed = true;
-            const btn = document.getElementById('btnReward');
-            btn.innerHTML = `✅ Keputusan Preventif Diterapkan!`;
-            btn.classList.replace('bg-purple-100', 'bg-green-100');
-            btn.classList.replace('text-purple-900', 'text-green-800');
-            btn.classList.add('pop-animation');
-            
-            let hpElement = document.getElementById('displayHP');
-            hpElement.innerText = parseInt(hpElement.innerText) + 25;
-            hpElement.classList.add('text-green-600', 'pop-animation');
-            document.getElementById('displayStreak').innerText = 5;
 
-            showToast('⭐ +25 Health Points (Integrasi Gamifikasi)');
+
+            const button =
+                document.getElementById(
+                    'btnReward'
+                );
+
+            if (button) {
+
+                button.innerHTML =
+                    '✅ Pilihan preventif diterapkan';
+
+                button.classList.remove(
+                    'bg-purple-100',
+                    'text-purple-900'
+                );
+
+                button.classList.add(
+                    'bg-green-100',
+                    'text-green-800',
+                    'pop-animation'
+                );
+
+            }
+
+
+            const hp =
+                document.getElementById(
+                    'displayHP'
+                );
+
+            if (hp) {
+
+                hp.innerText =
+                    parseInt(hp.innerText) + 25;
+
+                hp.classList.add(
+                    'pop-animation'
+                );
+
+            }
+
+
+            const streak =
+                document.getElementById(
+                    'displayStreak'
+                );
+
+            if (streak) {
+                streak.innerText = '5';
+            }
+
+
+            showToast(
+                '⭐ +25 Health Points'
+            );
+
 
             setTimeout(() => {
-                hpElement.classList.remove('text-green-600', 'pop-animation');
-                btn.classList.remove('pop-animation');
-                document.getElementById('skrining-box').classList.remove('hidden');
-                document.getElementById('app-content').scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
-                showToast('⚠️ Sistem mendeteksi kebutuhan tindak lanjut');
-            }, 1800);
+
+                const screening =
+                    document.getElementById(
+                        'skrining-box'
+                    );
+
+                if (screening) {
+                    screening.classList.remove(
+                        'hidden'
+                    );
+                }
+
+                showToast(
+                    '⚠️ Sistem menampilkan opsi tindak lanjut'
+                );
+
+            }, 1700);
+
         }
 
-        function rujukFaskes() {
-            showToast('🏥 Mengakses Data Rujukan SATUSEHAT...');
+
+        /* =====================================================
+           DOWNLOAD DIAGRAM
+        ====================================================== */
+
+        function downloadDiagram(format) {
+
+            showToast(
+                '⏳ Menyiapkan diagram...'
+            );
+
+
+            const svgData = `
+<svg xmlns="http://www.w3.org/2000/svg"
+     width="1200"
+     height="850"
+     viewBox="0 0 1200 850">
+
+    <rect width="1200"
+          height="850"
+          fill="#F9FAFB"/>
+
+    <text x="600"
+          y="55"
+          text-anchor="middle"
+          font-family="Times New Roman"
+          font-size="30"
+          font-weight="bold"
+          fill="#1F2937">
+        METABOLICBUDDY 5.0
+    </text>
+
+    <text x="600"
+          y="82"
+          text-anchor="middle"
+          font-family="Arial"
+          font-size="16"
+          fill="#6B7280">
+        Alur Kerja Pendamping Preventif Terintegrasi SATUSEHAT
+    </text>
+
+
+    <!-- INPUT 1 -->
+    <rect x="80"
+          y="130"
+          width="300"
+          height="105"
+          rx="14"
+          fill="#F3E8FF"
+          stroke="#A855F7"
+          stroke-width="3"/>
+
+    <text x="230"
+          y="170"
+          text-anchor="middle"
+          font-family="Arial"
+          font-size="19"
+          font-weight="bold"
+          fill="#1F2937">
+        FOTO PANGAN
+    </text>
+
+    <text x="230"
+          y="200"
+          text-anchor="middle"
+          font-family="Arial"
+          font-size="14"
+          fill="#4B5563">
+        Computer Vision AI
+    </text>
+
+
+    <!-- INPUT 2 -->
+    <rect x="820"
+          y="130"
+          width="300"
+          height="105"
+          rx="14"
+          fill="#F3E8FF"
+          stroke="#A855F7"
+          stroke-width="3"/>
+
+    <text x="970"
+          y="170"
+          text-anchor="middle"
+          font-family="Arial"
+          font-size="19"
+          font-weight="bold"
+          fill="#1F2937">
+        DATA AKTIVITAS
+    </text>
+
+    <text x="970"
+          y="200"
+          text-anchor="middle"
+          font-family="Arial"
+          font-size="14"
+          fill="#4B5563">
+        Langkah • Aktivitas • Sedentari
+    </text>
+
+
+    <!-- PROFILE -->
+    <rect x="300"
+          y="315"
+          width="600"
+          height="120"
+          rx="16"
+          fill="#8B5CF6"/>
+
+    <text x="600"
+          y="360"
+          text-anchor="middle"
+          font-family="Arial"
+          font-size="22"
+          font-weight="bold"
+          fill="white">
+        METABOLIC BEHAVIOR PROFILE
+    </text>
+
+    <text x="600"
+          y="392"
+          text-anchor="middle"
+          font-family="Arial"
+          font-size="15"
+          fill="#F3E8FF">
+        Konsumsi • Aktivitas • Konsistensi
+    </text>
+
+    <text x="600"
+          y="417"
+          text-anchor="middle"
+          font-family="Arial"
+          font-size="12"
+          fill="#F3E8FF">
+        Terkendali • Perlu Perhatian • Perlu Tindak Lanjut
+    </text>
+
+
+    <!-- NUDGE -->
+    <rect x="300"
+          y="505"
+          width="600"
+          height="120"
+          rx="16"
+          fill="#F3E8FF"
+          stroke="#8B5CF6"
+          stroke-width="3"/>
+
+    <text x="600"
+          y="550"
+          text-anchor="middle"
+          font-family="Arial"
+          font-size="22"
+          font-weight="bold"
+          font-style="italic"
+          fill="#1F2937">
+        ADAPTIVE MICRO-NUDGE
+    </text>
+
+    <text x="600"
+          y="582"
+          text-anchor="middle"
+          font-family="Arial"
+          font-size="15"
+          fill="#4B5563">
+        Smart Swapping + Gamifikasi
+    </text>
+
+
+    <!-- OUTPUT 1 -->
+    <rect x="100"
+          y="700"
+          width="390"
+          height="80"
+          rx="14"
+          fill="white"
+          stroke="#00928F"
+          stroke-width="3"/>
+
+    <text x="295"
+          y="735"
+          text-anchor="middle"
+          font-family="Arial"
+          font-size="17"
+          font-weight="bold"
+          fill="#1F2937">
+        PERUBAHAN KEBIASAAN
+    </text>
+
+    <text x="295"
+          y="760"
+          text-anchor="middle"
+          font-family="Arial"
+          font-size="12"
+          fill="#6B7280">
+        Pilihan kecil yang konsisten
+    </text>
+
+
+    <!-- OUTPUT 2 -->
+    <rect x="710"
+          y="700"
+          width="390"
+          height="80"
+          rx="14"
+          fill="white"
+          stroke="#00928F"
+          stroke-width="3"/>
+
+    <text x="905"
+          y="735"
+          text-anchor="middle"
+          font-family="Arial"
+          font-size="17"
+          font-weight="bold"
+          fill="#00928F">
+        TINDAK LANJUT KESEHATAN
+    </text>
+
+    <text x="905"
+          y="760"
+          text-anchor="middle"
+          font-family="Arial"
+          font-size="12"
+          fill="#6B7280">
+        Pemeriksaan oleh tenaga kesehatan
+    </text>
+
+
+    <!-- ARROWS -->
+    <defs>
+        <marker id="arrow"
+                markerWidth="10"
+                markerHeight="10"
+                refX="9"
+                refY="3"
+                orient="auto">
+            <path d="M0,0 L0,6 L9,3 z"
+                  fill="#6B7280"/>
+        </marker>
+    </defs>
+
+
+    <line x1="230"
+          y1="235"
+          x2="390"
+          y2="315"
+          stroke="#6B7280"
+          stroke-width="3"
+          marker-end="url(#arrow)"/>
+
+    <line x1="970"
+          y1="235"
+          x2="810"
+          y2="315"
+          stroke="#6B7280"
+          stroke-width="3"
+          marker-end="url(#arrow)"/>
+
+    <line x1="600"
+          y1="435"
+          x2="600"
+          y2="505"
+          stroke="#6B7280"
+          stroke-width="3"
+          marker-end="url(#arrow)"/>
+
+    <line x1="500"
+          y1="625"
+          x2="295"
+          y2="700"
+          stroke="#6B7280"
+          stroke-width="3"
+          marker-end="url(#arrow)"/>
+
+    <line x1="700"
+          y1="625"
+          x2="905"
+          y2="700"
+          stroke="#6B7280"
+          stroke-width="3"
+          marker-end="url(#arrow)"/>
+
+
+    <text x="600"
+          y="825"
+          text-anchor="middle"
+          font-family="Arial"
+          font-size="12"
+          fill="#6B7280">
+        Sumber: Diolah oleh penulis, 2026.
+    </text>
+
+</svg>`;
+
+
+            const blob =
+                new Blob(
+                    [svgData],
+                    {
+                        type:
+                        'image/svg+xml;charset=utf-8'
+                    }
+                );
+
+            const url =
+                URL.createObjectURL(blob);
+
+
             setTimeout(() => {
-                alert("Simulasi Integrasi Closed-Loop:\n\nPengguna akan diarahkan ke halaman 'Buat Janji Temu FKTP / Puskesmas' resmi di aplikasi SATUSEHAT Mobile untuk pemeriksaan glukosa darah.");
-            }, 1000);
+
+                if (format === 'svg') {
+
+                    const a =
+                        document.createElement('a');
+
+                    a.href = url;
+
+                    a.download =
+                        'Gambar_1_Alur_METABOLICBUDDY_5.0.svg';
+
+                    document.body.appendChild(a);
+
+                    a.click();
+
+                    document.body.removeChild(a);
+
+                    showToast(
+                        '✅ Diagram SVG berhasil dibuat'
+                    );
+
+                }
+
+
+                if (format === 'png') {
+
+                    const canvas =
+                        document.createElement('canvas');
+
+                    canvas.width = 1200;
+                    canvas.height = 850;
+
+                    const ctx =
+                        canvas.getContext('2d');
+
+                    const image =
+                        new Image();
+
+                    image.onload = function() {
+
+                        ctx.drawImage(
+                            image,
+                            0,
+                            0
+                        );
+
+                        const pngUrl =
+                            canvas.toDataURL(
+                                'image/png'
+                            );
+
+                        const a =
+                            document.createElement('a');
+
+                        a.href = pngUrl;
+
+                        a.download =
+                            'Gambar_1_Alur_METABOLICBUDDY_5.0.png';
+
+                        document.body.appendChild(a);
+
+                        a.click();
+
+                        document.body.removeChild(a);
+
+                        URL.revokeObjectURL(url);
+
+                        showToast(
+                            '✅ Diagram PNG berhasil dibuat'
+                        );
+
+                    };
+
+                    image.src = url;
+                }
+
+            }, 500);
+
         }
+
+
+        /* =====================================================
+           OPTIONAL SYSTEM MENU
+        ====================================================== */
+
+        /*
+         * Tombol tambahan berikut dapat dipanggil dari console
+         * atau dikembangkan menjadi menu "Sistem".
+         */
+
+        function showEvaluation() {
+            navigate('evaluation');
+        }
+
+        function showSWOT() {
+            navigate('swot');
+        }
+
+        function showAbout() {
+            navigate('about');
+        }
+
+
+        /* =====================================================
+           EXIT
+        ====================================================== */
 
         function keluarSistem() {
-            document.getElementById('bottom-nav').classList.add('hidden');
+
+            document
+                .getElementById('bottom-nav')
+                .classList.add('hidden');
+
             navigate('satusehat');
+
+            showToast(
+                'Keluar dari Modul Diari Sehat'
+            );
+
         }
 
-        // Generator Diagram (Blueprint Esai Gambar 1)
-        function downloadDiagram(format) {
-            showToast('⏳ Menyiapkan file ' + format.toUpperCase() + '...');
-            const svgData = `
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="100%" height="100%" style="background-color:#F9FAFB; font-family:'Times New Roman', serif;">
-                <rect x="20" y="20" width="760" height="560" rx="16" fill="#FFFFFF" stroke="#D1D5DB" stroke-width="2"/>
-                <text x="400" y="60" font-size="24" font-weight="bold" fill="#1F2937" text-anchor="middle">METABOLICBUDDY 5.0</text>
-                <text x="400" y="80" font-size="14" fill="#6B7280" text-anchor="middle">Terintegrasi SATUSEHAT Mobile</text>
-                
-                <rect x="150" y="110" width="200" height="60" rx="8" fill="#F3E8FF" stroke="#A855F7" stroke-width="2"/>
-                <text x="250" y="135" font-size="14" font-weight="bold" fill="#1F2937" text-anchor="middle">FOTO PANGAN</text>
-                <text x="250" y="155" font-size="12" fill="#4B5563" text-anchor="middle">Computer Vision AI</text>
-
-                <rect x="450" y="110" width="200" height="60" rx="8" fill="#F3E8FF" stroke="#A855F7" stroke-width="2"/>
-                <text x="550" y="135" font-size="14" font-weight="bold" fill="#1F2937" text-anchor="middle">DATA AKTIVITAS</text>
-                <text x="550" y="155" font-size="12" fill="#4B5563" text-anchor="middle">Google Fit / Apple Health</text>
-
-                <line x1="250" y1="170" x2="400" y2="210" stroke="#6B7280" stroke-width="2" marker-end="url(#arrow)"/>
-                <line x1="550" y1="170" x2="400" y2="210" stroke="#6B7280" stroke-width="2" marker-end="url(#arrow)"/>
-
-                <rect x="250" y="220" width="300" height="70" rx="8" fill="#A855F7" />
-                <text x="400" y="250" font-size="16" font-weight="bold" fill="#FFFFFF" text-anchor="middle">METABOLIC BEHAVIOR PROFILE</text>
-                <text x="400" y="270" font-size="12" fill="#F3E8FF" text-anchor="middle">Pola Konsumsi, Aktivitas & Konsistensi</text>
-
-                <line x1="400" y1="290" x2="400" y2="330" stroke="#6B7280" stroke-width="2" marker-end="url(#arrow)"/>
-
-                <rect x="250" y="340" width="300" height="70" rx="8" fill="#F3E8FF" stroke="#A855F7" stroke-width="2"/>
-                <text x="400" y="370" font-size="16" font-weight="bold" font-style="italic" fill="#1F2937" text-anchor="middle">ADAPTIVE MICRO-NUDGE</text>
-                <text x="400" y="390" font-size="12" fill="#4B5563" text-anchor="middle">Smart Swapping & Gamifikasi</text>
-
-                <line x1="400" y1="410" x2="400" y2="450" stroke="#6B7280" stroke-width="2" marker-end="url(#arrow)"/>
-
-                <rect x="150" y="460" width="220" height="50" rx="8" fill="#FFFFFF" stroke="#00928F" stroke-width="2"/>
-                <text x="260" y="490" font-size="14" font-weight="bold" fill="#1F2937" text-anchor="middle">PERUBAHAN KEBIASAAN</text>
-
-                <rect x="430" y="460" width="220" height="50" rx="8" fill="#FFFFFF" stroke="#00928F" stroke-width="2"/>
-                <text x="540" y="490" font-size="14" font-weight="bold" fill="#00928F" text-anchor="middle">RUJUKAN FKTP (SATUSEHAT)</text>
-
-                <line x1="400" y1="410" x2="260" y2="450" stroke="#6B7280" stroke-width="2" marker-end="url(#arrow)"/>
-                <line x1="400" y1="410" x2="540" y2="450" stroke="#6B7280" stroke-width="2" marker-end="url(#arrow)"/>
-
-                <defs>
-                    <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
-                        <path d="M0,0 L0,6 L9,3 z" fill="#6B7280" />
-                    </marker>
-                </defs>
-            </svg>`;
-
-            const blob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
-            const url = URL.createObjectURL(blob);
-
-            setTimeout(() => {
-                if (format === 'svg') {
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = 'Alur_Kerja_MetabolicBuddy.svg';
-                    document.body.appendChild(a);
-                    a.click();
-                    document.body.removeChild(a);
-                    showToast('✅ Berhasil mengunduh format SVG');
-                } else if (format === 'png') {
-                    const canvas = document.createElement('canvas');
-                    canvas.width = 800;
-                    canvas.height = 600;
-                    const ctx = canvas.getContext('2d');
-                    const img = new Image();
-                    img.onload = function() {
-                        ctx.drawImage(img, 0, 0);
-                        const pngUrl = canvas.toDataURL('image/png');
-                        const a = document.createElement('a');
-                        a.href = pngUrl;
-                        a.download = 'Alur_Kerja_MetabolicBuddy.png';
-                        document.body.appendChild(a);
-                        a.click();
-                        document.body.removeChild(a);
-                        URL.revokeObjectURL(url);
-                        showToast('✅ Berhasil mengunduh format PNG');
-                    };
-                    img.src = url;
-                }
-            }, 800);
-        }
     </script>
+
+</div>
+
 </body>
 </html>
