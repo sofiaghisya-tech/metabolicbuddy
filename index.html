@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>METABOLICBUDDY 5.0 - Integrasi SATUSEHAT</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Inter:wght@400;500;600;700&display=swap');
+        
+        :root {
+            /* Warna Khas Kemenkes/SATUSEHAT */
+            --ss-green: #00928F;
+            --ss-light: #E0F2F1;
+            /* Warna Modul METABOLICBUDDY */
+            --mb-bg: #F9FAFB;
+            --mb-primary: #8B5CF6; 
+            --mb-dark: #4C1D95;
+        }
+        
+        body {
+            background-color: #E5E7EB;
+            font-family: 'Inter', sans-serif;
+            color: #1F2937;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .font-serif-custom { font-family: 'Lora', 'Times New Roman', serif; }
+
+        .mobile-frame {
+            width: 100%;
+            height: 100vh;
+            background-color: #FFFFFF;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        @media (min-width: 640px) {
+            .mobile-frame {
+                width: 390px;
+                height: 844px;
+                max-height: 95vh;
+                border-radius: 40px;
+                box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+                border: 8px solid #111827;
+            }
+        }
+
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        .fade-in { animation: fadeIn 0.3s ease-in-out forwards; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .nav-active { color: var(--mb-primary); font-weight: 700; transform: scale(1.1); }
+        
+        /* Notifikasi Toast SATUSEHAT */
+        #toast-container {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            width: 90%;
+        }
+        .toast {
+            background-color: var(--mb-dark);
+            color: white;
+            padding: 12px 16px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            text-align: center;
+            animation: slideDown 0.3s ease-out forwards, fadeOut 0.3s ease-in 2.7s forwards;
+            opacity: 0;
+        }
+        @keyframes slideDown { from { transform: translateY(-20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
+    </style>
+</head>
+<body>
+
+    <div class="mobile-frame">
+        <div id="toast-container"></div>
+
+        <!-- Status Bar (Global) -->
+        <div class="flex justify-between items-center px-6 py-3 text-xs font-medium text-gray-800 bg-white z-20 shadow-sm relative">
+            <span id="clock">09:41</span>
+            <div class="flex gap-1.5 items-center">
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.08 2.93 1 9zm8 8l3 3 3-3c-1.65-1.66-4.36-1.66-6 0zm-4-4l2 2c2.76-2.76 7.24-2.76 10 0l2-2C15.14 9.14 8.87 9.14 5 13z"/></svg>
+            </div>
+        </div>
+
+        <div id="app-content" class="flex-1 overflow-y-auto no-scrollbar pb-24 relative bg-gray-50">
+            
+            <!-- ================= LAYAR 0: LOGIN & SATUSEHAT ENTRY ================= -->
+            <div id="screen-satusehat" class="flex flex-col h-full bg-white fade-in">
+                <!-- SATUSEHAT Header -->
+                <div class="bg-[#00928F] text-white px-6 pt-6 pb-8 rounded-b-3xl shadow-md">
+                    <div class="flex justify-between items-center mb-6">
+                        <h1 class="font-bold text-xl tracking-wide">SATUSEHAT</h1>
+                        <div class="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">👤</div>
+                    </div>
+                    <p class="text-xs text-[#E0F2F1] mb-1">Selamat Pagi,</p>
+                    <h2 class="font-bold text-lg">Sofia Ghina Syahira</h2>
+                    <p class="text-[10px] mt-2 bg-white/20 inline-block px-3 py-1 rounded-full border border-white/30">NIK: 167104********24</p>
+                </div>
+
+                <div class="px-6 mt-6">
+                    <h3 class="font-bold text-sm text-gray-800 mb-4">Layanan Kesehatan Anda</h3>
+                    <div class="grid grid-cols-4 gap-4 mb-8">
+                        <div class="flex flex-col items-center gap-2 cursor-not-allowed opacity-60">
+                            <div class="w-12 h-12 bg-gray-100 rounded-2xl flex items-center justify-center text-xl">📄</div>
+                            <span class="text-[9px] text-center font-medium text-gray-600">Resume<br>Medis</span>
+                        </div>
+                        <div class="flex flex-col items-center gap-2 cursor-not-allowed opacity-60">
+                            <div class="w-12 h-12 bg-gray-100 rounded-2xl flex items-center justify-center text-xl">💉</div>
+                            <span class="text-[9px] text-center font-medium text-gray-600">Vaksin &<br>Imunisasi</span>
+                        </div>
+                        <div class="flex flex-col items-center gap-2 cursor-not-allowed opacity-60">
+                            <div class="w-12 h-12 bg-gray-100 rounded-2xl flex items-center justify-center text-xl">🏥</div>
+                            <span class="text-[9px] text-center font-medium text-gray-600">Cari<br>Kamar</span>
+                        </div>
+                        <!-- Entry Point METABOLICBUDDY -->
+                        <div onclick="openMetabolicBuddy()" class="flex flex-col items-center gap-2 cursor-pointer transform hover:scale-105 transition">
+                            <div class="w-12 h-12 bg-purple-100 border border-purple-300 rounded-2xl flex items-center justify-center text-xl shadow-sm relative">
+                                📊
+                                <span class="absolute -top-1 -right-1 flex h-3 w-3">
+                                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-purple-400 opacity-75"></span>
+                                  <span class="relative inline-flex rounded-full h-3 w-3 bg-purple-600"></span>
+                                </span>
+                            </div>
+                            <span class="text-[9px] text-center font-bold text-purple-700">Diari<br>Sehat</span>
+                        </div>
+                    </div>
+
+                    <div class="bg-[#E0F2F1] rounded-2xl p-4 border border-[#00928F]/20 flex items-center justify-between">
+                        <div>
+                            <h4 class="font-bold text-xs text-[#00928F] mb-1">Modul METABOLICBUDDY 5.0</h4>
+                            <p class="text-[10px] text-teal-800">Cegah diabetes dari pola harianmu. Modul ini terintegrasi API Satu Data.</p>
+                        </div>
+                        <div class="text-2xl ml-2">✨</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ================= LAYAR 1: BERANDA MB 5.0 ================= -->
+            <div id="screen-home" class="hidden px-6 pt-5 pb-6 fade-in min-h-full">
+                <!-- Header Integrasi -->
+                <div class="flex justify-between items-center mb-6">
+                    <div>
+                        <h1 class="font-serif-custom font-bold text-lg text-purple-900">METABOLICBUDDY <span class="text-xs font-normal">5.0</span></h1>
+                        <p class="text-[10px] text-gray-500 font-medium flex items-center gap-1 mt-1">
+                            <span class="w-2 h-2 rounded-full bg-green-500"></span> Terhubung SATUSEHAT
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Gamifikasi: HP & Streak -->
+                <div class="grid grid-cols-2 gap-3 mb-6">
+                    <div class="bg-white border border-purple-100 rounded-2xl p-4 shadow-sm flex flex-col items-center">
+                        <span class="text-2xl mb-1">🔥</span>
+                        <span class="text-xl font-bold text-gray-800" id="displayStreak">4</span>
+                        <span class="text-[10px] font-semibold text-gray-500 uppercase tracking-wider">Hari Streak</span>
+                    </div>
+                    <div class="bg-gradient-to-br from-purple-500 to-purple-700 rounded-2xl p-4 shadow-md flex flex-col items-center text-white relative overflow-hidden">
+                        <span class="text-2xl mb-1 relative z-10">⭐</span>
+                        <span class="text-xl font-bold relative z-10" id="displayHP">120</span>
+                        <span class="text-[10px] font-semibold text-purple-200 uppercase tracking-wider relative z-10">Health Points</span>
+                    </div>
+                </div>
+
+                <!-- API Integration Notice -->
+                <div class="bg-white border border-gray-200 rounded-xl p-3 mb-5 shadow-sm flex items-center gap-3">
+                    <div class="w-8 h-8 bg-blue-50 rounded-full flex items-center justify-center text-lg">⌚</div>
+                    <div class="flex-1">
+                        <h4 class="text-xs font-bold text-gray-800">Sinkronisasi Aktivitas Aktif</h4>
+                        <p class="text-[9px] text-gray-500">Data langkah dari <i>Google Fit / Apple Health</i> ditarik otomatis.</p>
+                    </div>
+                </div>
+
+                <h3 class="font-bold text-xs text-gray-800 uppercase tracking-wider mb-3">Tantangan Mingguan</h3>
+                <div class="bg-white border border-gray-200 rounded-2xl p-4 shadow-sm mb-6">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-xs font-bold text-gray-800">Terapkan 5 Smart Swap</span>
+                        <span class="text-[10px] font-bold text-purple-600 bg-purple-50 px-2 py-1 rounded">+50 HP</span>
+                    </div>
+                    <div class="w-full bg-gray-100 rounded-full h-2 mb-2">
+                        <div class="bg-purple-500 h-2 rounded-full" style="width: 60%"></div>
+                    </div>
+                    <p class="text-[10px] text-gray-500 text-right">3/5 Selesai</p>
+                </div>
+            </div>
+
+            <!-- ================= LAYAR 2: SCAN PANGAN ================= -->
+            <div id="screen-scan" class="hidden px-6 pt-5 pb-6 fade-in min-h-full">
+                <div class="flex items-center mb-6 pb-2 border-b border-purple-100">
+                    <h1 class="font-serif-custom font-bold text-lg text-purple-900 flex-1 text-center">Scan Pangan</h1>
+                </div>
+
+                <div id="scan-placeholder" class="bg-purple-50 border border-purple-200 rounded-2xl p-6 mb-6 relative h-64 flex flex-col items-center justify-center text-center">
+                    <div class="text-4xl mb-3 opacity-50">📷</div>
+                    <p class="text-xs text-gray-600 mb-5 leading-relaxed">Arahkan kamera ke hidangan. Computer Vision AI akan memindai jenis dan estimasi porsi.</p>
+                    <button onclick="simulateScan()" class="bg-purple-600 text-white px-6 py-3 rounded-xl text-sm font-bold shadow-md hover:bg-purple-700 transition">
+                        Simulasi Scan AI
+                    </button>
+                </div>
+
+                <div id="scan-result" class="hidden">
+                    <div class="relative w-full h-48 rounded-xl overflow-hidden mb-5 border-2 border-purple-200">
+                        <img src="https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=600&q=80" alt="Makanan" class="w-full h-full object-cover">
+                        <div class="absolute inset-0 border-2 border-purple-500 border-dashed opacity-80 m-4 rounded-lg"></div>
+                        <span class="absolute top-6 left-6 bg-purple-600 text-white text-[10px] font-bold px-2 py-1 rounded shadow">CNN ResNet-50</span>
+                    </div>
+                    <div class="bg-white rounded-xl p-4 mb-6 border border-purple-100 shadow-sm">
+                        <p class="text-[10px] text-gray-500 font-bold uppercase mb-1">Terdeteksi:</p>
+                        <p class="text-sm text-gray-800 font-bold mb-3 border-b border-gray-100 pb-2">Nasi + Ayam + Minuman Manis</p>
+                        <p class="text-[10px] text-gray-500 font-bold uppercase mb-1">Estimasi Porsi:</p>
+                        <p class="text-sm text-gray-800 font-bold">1 Porsi (Tinggi Karbohidrat Sederhana)</p>
+                    </div>
+                    <button onclick="saveScan()" class="w-full bg-purple-100 hover:bg-purple-200 text-purple-900 font-bold py-3.5 rounded-xl transition text-sm">
+                        Simpan ke Profil Perilaku
+                    </button>
+                </div>
+                <p class="text-[10px] text-gray-400 italic text-center mt-6">Hasil pengenalan merupakan estimasi visual.</p>
+            </div>
+
+            <!-- ================= LAYAR 3: METABOLIC BEHAVIOR PROFILE ================= -->
+            <div id="screen-profile" class="hidden px-6 pt-5 pb-6 fade-in min-h-full">
+                <div class="flex items-center mb-4 pb-2 border-b border-purple-100">
+                    <h1 class="font-serif-custom italic font-bold text-lg text-purple-900 flex-1 text-center">Metabolic Behavior Profile</h1>
+                </div>
+                <p class="text-[11px] text-gray-600 mb-5 text-center">Ringkasan pola kebiasaan dari integrasi data pangan & aktivitas harian.</p>
+
+                <!-- Kategori Perilaku -->
+                <div class="bg-purple-50 border border-purple-200 rounded-xl p-4 shadow-sm flex items-center justify-between mb-5">
+                    <div>
+                        <h3 class="font-bold text-xs text-gray-800 mb-0.5">Status Pola Perilaku</h3>
+                        <p class="text-[10px] text-gray-500">Perbaikan perlu dilakukan bertahap.</p>
+                    </div>
+                    <span class="text-xs font-bold text-amber-700 bg-amber-100 px-3 py-1.5 rounded-lg border border-amber-200">Perlu Perhatian</span>
+                </div>
+
+                <div class="space-y-3 mb-6">
+                    <div class="bg-white border border-gray-200 rounded-xl p-4 flex gap-4 shadow-sm items-center">
+                        <div class="text-2xl bg-gray-50 p-2 rounded-full">🍽️</div>
+                        <div>
+                            <h3 class="font-bold text-xs text-gray-800 mb-0.5">Pola Konsumsi</h3>
+                            <p class="text-[11px] text-gray-500 leading-relaxed">Minuman tinggi gula dan pangan ultra-proses muncul beberapa kali.</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-white border border-gray-200 rounded-xl p-4 flex gap-4 shadow-sm items-center relative">
+                        <div class="text-2xl bg-gray-50 p-2 rounded-full">🚶</div>
+                        <div>
+                            <h3 class="font-bold text-xs text-gray-800 mb-0.5">Pola Aktivitas</h3>
+                            <p class="text-[11px] text-gray-500 leading-relaxed">Aktivitas fisik cukup, tetapi masih terdapat kecenderungan sedentari.</p>
+                        </div>
+                        <span class="absolute top-2 right-2 flex h-2 w-2">
+                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                            <span class="relative inline-flex rounded-full h-2 w-2 bg-blue-500" title="Data dari Google Fit via SATUSEHAT"></span>
+                        </span>
+                    </div>
+                    
+                    <div class="bg-white border border-gray-200 rounded-xl p-4 flex gap-4 shadow-sm items-center">
+                        <div class="text-2xl bg-gray-50 p-2 rounded-full">🔄</div>
+                        <div>
+                            <h3 class="font-bold text-xs text-gray-800 mb-0.5">Konsistensi Kebiasaan</h3>
+                            <p class="text-[11px] text-gray-500 leading-relaxed">Konsistensi penerapan pola sehat masih belum terbentuk utuh.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-gray-100 rounded-xl p-3 border border-gray-200 text-center">
+                    <p class="text-[9px] text-gray-500 italic font-medium">Sistem ini tidak mendiagnosis diabetes dan tidak menggantikan pemeriksaan kadar gula darah.</p>
+                </div>
+            </div>
+
+            <!-- ================= LAYAR 4: ADAPTIVE MICRO-NUDGE & SWAPPING ================= -->
+            <div id="screen-nudge" class="hidden px-6 pt-5 pb-6 fade-in min-h-full">
+                <div class="flex items-center mb-6 pb-2 border-b border-purple-100">
+                    <h1 class="font-serif-custom italic font-bold text-lg text-purple-900 flex-1 text-center">Adaptive Micro-Nudge</h1>
+                </div>
+
+                <div class="bg-purple-50 rounded-2xl p-5 mb-6 border border-purple-200 shadow-sm relative overflow-hidden">
+                    <div class="absolute -right-4 -top-4 text-7xl opacity-5">💡</div>
+                    <h3 class="font-bold text-xs text-purple-900 mb-2 relative z-10 flex items-center gap-1">Umpan Balik Preventif</h3>
+                    <p class="text-xs text-purple-900 leading-relaxed relative z-10 font-medium">
+                        "Minuman manis tinggi gula beberapa kali dipilih. Untuk pilihan berikutnya, coba ukuran lebih kecil atau minuman tanpa tambahan gula."
+                    </p>
+                </div>
+
+                <h3 class="font-bold text-xs text-gray-800 uppercase tracking-wider mb-3">Smart Swapping</h3>
+                <div class="bg-white border border-gray-200 rounded-2xl p-5 shadow-sm text-center mb-6">
+                    <div class="flex items-center justify-between px-2 mb-6">
+                        <div class="flex flex-col items-center">
+                            <div class="w-12 h-12 bg-gray-50 rounded-full flex items-center justify-center text-3xl mb-2">🧋</div>
+                            <span class="text-[10px] text-gray-500 font-medium w-16 leading-tight">Minuman Manis</span>
+                        </div>
+                        <span class="text-2xl text-purple-500 font-bold">→</span>
+                        <div class="flex flex-col items-center">
+                            <div class="w-12 h-12 bg-purple-50 rounded-full flex items-center justify-center text-3xl mb-2 border border-purple-100">💧</div>
+                            <span class="text-[10px] text-gray-800 font-bold w-16 leading-tight">Tanpa Tambahan Gula</span>
+                        </div>
+                    </div>
+
+                    <button id="btnReward" onclick="claimReward()" class="w-full bg-purple-100 hover:bg-purple-200 text-purple-900 font-bold py-3.5 rounded-xl transition text-xs shadow-sm flex justify-center items-center gap-2">
+                        Terapkan Keputusan Ini <span class="bg-purple-500 text-white px-2 py-0.5 rounded text-[10px] shadow-sm">+25 HP</span>
+                    </button>
+                </div>
+
+                <!-- INTEGRASI RUJUKAN SATUSEHAT -->
+                <div id="skrining-box" class="hidden mt-6 bg-red-50 border border-red-200 rounded-2xl p-5 text-center fade-in">
+                    <h4 class="text-xs font-bold text-red-800 mb-2 flex justify-center items-center gap-1">⚠️ Rekomendasi Medis</h4>
+                    <p class="text-[10px] text-red-700 leading-relaxed mb-4">Pola perilaku "Perlu Perhatian" muncul berulang dalam 14 hari. Sistem menyarankan verifikasi kesehatan formal (Skrining Glukosa).</p>
+                    <button onclick="rujukFaskes()" class="text-[10px] font-bold text-white bg-red-600 px-5 py-3 rounded-xl hover:bg-red-700 transition w-full shadow-sm flex justify-center items-center gap-2">
+                        🏥 Daftar Antrean FKTP via SATUSEHAT
+                    </button>
+                </div>
+            </div>
+
+            <!-- ================= LAYAR 5: PROFIL SISTEM & UNDUH ================= -->
+            <div id="screen-user" class="hidden px-6 pt-5 pb-6 fade-in min-h-full">
+                <div class="flex items-center mb-6 pb-2 border-b border-purple-100">
+                    <h1 class="font-serif-custom font-bold text-lg text-purple-900 flex-1 text-center">Profil & Keamanan RME</h1>
+                </div>
+
+                <div class="bg-white border border-gray-200 rounded-2xl p-5 mb-5 shadow-sm text-center">
+                    <div class="text-3xl mb-3">📥</div>
+                    <h3 class="font-bold text-sm text-gray-800 mb-2">Unduh Diagram Konseptual</h3>
+                    <p class="text-[10px] text-gray-500 leading-relaxed mb-5">Simpan Diagram Mekanisme METABOLICBUDDY 5.0 (Visualisasi Gambar 1 pada Naskah Esai).</p>
+                    <div class="flex gap-2">
+                        <button onclick="downloadDiagram('svg')" class="flex-1 bg-purple-50 text-purple-800 py-3 rounded-xl text-xs font-bold border border-purple-200 hover:bg-purple-100 transition shadow-sm">Unduh SVG</button>
+                        <button onclick="downloadDiagram('png')" class="flex-1 bg-purple-600 text-white py-3 rounded-xl text-xs font-bold hover:bg-purple-700 transition shadow-sm">Unduh PNG</button>
+                    </div>
+                </div>
+
+                <div class="bg-gray-100 rounded-2xl p-4 border border-gray-200 text-center shadow-inner mb-6">
+                    <h4 class="font-bold text-[10px] text-gray-700 mb-1">Tata Kelola Data (RME)</h4>
+                    <p class="text-[9px] text-gray-500 leading-relaxed">
+                        Data riwayat perilaku dienkripsi dan diintegrasikan langsung ke dalam arsitektur Satu Data Kesehatan SATUSEHAT Mobile. METABOLICBUDDY 5.0 patuh pada asas privasi pasien.
+                    </p>
+                </div>
+                
+                <button onclick="keluarSistem()" class="w-full text-[10px] font-bold text-red-500 py-3 rounded-xl border border-red-100 bg-white">Keluar dari Modul</button>
+            </div>
+
+        </div>
+
+        <!-- Bottom Navigation Mobile -->
+        <div id="bottom-nav" class="bg-white border-t border-gray-200 px-4 py-2.5 flex justify-between items-center absolute bottom-0 w-full z-50 hidden shadow-[0_-4px_10px_rgba(0,0,0,0.03)]">
+            <button onclick="navigate('home', 'nav-home')" id="nav-home" class="nav-active flex flex-col items-center gap-1 text-gray-400 w-1/5 transition-transform duration-200">
+                <span class="text-xl">🏠</span><span class="text-[9px] font-medium tracking-tight">Beranda</span>
+            </button>
+            <button onclick="navigate('scan', 'nav-scan')" id="nav-scan" class="flex flex-col items-center gap-1 text-gray-400 w-1/5 transition-transform duration-200">
+                <span class="text-xl">📷</span><span class="text-[9px] font-medium tracking-tight">Scan</span>
+            </button>
+            <button onclick="navigate('profile', 'nav-profile')" id="nav-profile" class="flex flex-col items-center gap-1 text-gray-400 w-1/5 transition-transform duration-200">
+                <span class="text-xl">📊</span><span class="text-[9px] font-medium tracking-tight">Pola</span>
+            </button>
+            <button onclick="navigate('nudge', 'nav-nudge')" id="nav-nudge" class="flex flex-col items-center gap-1 text-gray-400 w-1/5 transition-transform duration-200">
+                <span class="text-xl">💡</span><span class="text-[9px] font-medium tracking-tight">Nudge</span>
+            </button>
+            <button onclick="navigate('user', 'nav-user')" id="nav-user" class="flex flex-col items-center gap-1 text-gray-400 w-1/5 transition-transform duration-200">
+                <span class="text-xl">⚙️</span><span class="text-[9px] font-medium tracking-tight">Sistem</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Script Logika -->
+    <script>
+        setInterval(() => {
+            const now = new Date();
+            document.getElementById('clock').innerText = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
+        }, 1000);
+
+        function showToast(message) {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.innerText = message;
+            container.appendChild(toast);
+            setTimeout(() => { toast.remove(); }, 3000);
+        }
+
+        // Buka Modul dari SATUSEHAT Entry Point
+        function openMetabolicBuddy() {
+            document.getElementById('screen-satusehat').classList.add('hidden');
+            document.getElementById('bottom-nav').classList.remove('hidden');
+            showToast('✅ Berhasil mengaktifkan Modul METABOLICBUDDY');
+            navigate('home', 'nav-home');
+        }
+
+        function navigate(screenId, navId) {
+            ['satusehat', 'home', 'scan', 'profile', 'nudge', 'user'].forEach(s => {
+                document.getElementById('screen-' + s).classList.add('hidden');
+            });
+            document.getElementById('screen-' + screenId).classList.remove('hidden');
+            document.getElementById('app-content').scrollTo(0,0);
+
+            if(navId) {
+                ['nav-home', 'nav-scan', 'nav-profile', 'nav-nudge', 'nav-user'].forEach(n => {
+                    const el = document.getElementById(n);
+                    if(el) { el.classList.remove('nav-active'); el.style.transform = "scale(1)"; el.style.color = "#9CA3AF"; }
+                });
+                const activeEl = document.getElementById(navId);
+                if(activeEl) { activeEl.classList.add('nav-active'); activeEl.style.transform = "scale(1.1)"; activeEl.style.color = "var(--mb-primary)"; }
+            }
+        }
+
+        function simulateScan() {
+            const btn = document.querySelector('#scan-placeholder button');
+            btn.innerText = "Computer Vision AI memproses...";
+            btn.classList.add('opacity-70', 'cursor-not-allowed');
+            setTimeout(() => {
+                document.getElementById('scan-placeholder').classList.add('hidden');
+                document.getElementById('scan-result').classList.remove('hidden');
+                showToast('🔍 Estimasi porsi & identifikasi pangan berhasil');
+            }, 1200); 
+        }
+
+        function saveScan() {
+            showToast('📊 Data digabung dengan riwayat Aktivitas');
+            setTimeout(() => { navigate('profile', 'nav-profile'); }, 1500);
+        }
+
+        let isClaimed = false;
+        function claimReward() {
+            if (isClaimed) return;
+            isClaimed = true;
+            const btn = document.getElementById('btnReward');
+            btn.innerHTML = `✅ Keputusan Preventif Diterapkan!`;
+            btn.classList.replace('bg-purple-100', 'bg-green-100');
+            btn.classList.replace('text-purple-900', 'text-green-800');
+            btn.classList.add('pop-animation');
+            
+            let hpElement = document.getElementById('displayHP');
+            hpElement.innerText = parseInt(hpElement.innerText) + 25;
+            hpElement.classList.add('text-green-600', 'pop-animation');
+            document.getElementById('displayStreak').innerText = 5;
+
+            showToast('⭐ +25 Health Points (Integrasi Gamifikasi)');
+
+            setTimeout(() => {
+                hpElement.classList.remove('text-green-600', 'pop-animation');
+                btn.classList.remove('pop-animation');
+                document.getElementById('skrining-box').classList.remove('hidden');
+                document.getElementById('app-content').scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+                showToast('⚠️ Sistem mendeteksi kebutuhan tindak lanjut');
+            }, 1800);
+        }
+
+        function rujukFaskes() {
+            showToast('🏥 Mengakses Data Rujukan SATUSEHAT...');
+            setTimeout(() => {
+                alert("Simulasi Integrasi Closed-Loop:\n\nPengguna akan diarahkan ke halaman 'Buat Janji Temu FKTP / Puskesmas' resmi di aplikasi SATUSEHAT Mobile untuk pemeriksaan glukosa darah.");
+            }, 1000);
+        }
+
+        function keluarSistem() {
+            document.getElementById('bottom-nav').classList.add('hidden');
+            navigate('satusehat');
+        }
+
+        // Generator Diagram (Blueprint Esai Gambar 1)
+        function downloadDiagram(format) {
+            showToast('⏳ Menyiapkan file ' + format.toUpperCase() + '...');
+            const svgData = `
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="100%" height="100%" style="background-color:#F9FAFB; font-family:'Times New Roman', serif;">
+                <rect x="20" y="20" width="760" height="560" rx="16" fill="#FFFFFF" stroke="#D1D5DB" stroke-width="2"/>
+                <text x="400" y="60" font-size="24" font-weight="bold" fill="#1F2937" text-anchor="middle">METABOLICBUDDY 5.0</text>
+                <text x="400" y="80" font-size="14" fill="#6B7280" text-anchor="middle">Terintegrasi SATUSEHAT Mobile</text>
+                
+                <rect x="150" y="110" width="200" height="60" rx="8" fill="#F3E8FF" stroke="#A855F7" stroke-width="2"/>
+                <text x="250" y="135" font-size="14" font-weight="bold" fill="#1F2937" text-anchor="middle">FOTO PANGAN</text>
+                <text x="250" y="155" font-size="12" fill="#4B5563" text-anchor="middle">Computer Vision AI</text>
+
+                <rect x="450" y="110" width="200" height="60" rx="8" fill="#F3E8FF" stroke="#A855F7" stroke-width="2"/>
+                <text x="550" y="135" font-size="14" font-weight="bold" fill="#1F2937" text-anchor="middle">DATA AKTIVITAS</text>
+                <text x="550" y="155" font-size="12" fill="#4B5563" text-anchor="middle">Google Fit / Apple Health</text>
+
+                <line x1="250" y1="170" x2="400" y2="210" stroke="#6B7280" stroke-width="2" marker-end="url(#arrow)"/>
+                <line x1="550" y1="170" x2="400" y2="210" stroke="#6B7280" stroke-width="2" marker-end="url(#arrow)"/>
+
+                <rect x="250" y="220" width="300" height="70" rx="8" fill="#A855F7" />
+                <text x="400" y="250" font-size="16" font-weight="bold" fill="#FFFFFF" text-anchor="middle">METABOLIC BEHAVIOR PROFILE</text>
+                <text x="400" y="270" font-size="12" fill="#F3E8FF" text-anchor="middle">Pola Konsumsi, Aktivitas & Konsistensi</text>
+
+                <line x1="400" y1="290" x2="400" y2="330" stroke="#6B7280" stroke-width="2" marker-end="url(#arrow)"/>
+
+                <rect x="250" y="340" width="300" height="70" rx="8" fill="#F3E8FF" stroke="#A855F7" stroke-width="2"/>
+                <text x="400" y="370" font-size="16" font-weight="bold" font-style="italic" fill="#1F2937" text-anchor="middle">ADAPTIVE MICRO-NUDGE</text>
+                <text x="400" y="390" font-size="12" fill="#4B5563" text-anchor="middle">Smart Swapping & Gamifikasi</text>
+
+                <line x1="400" y1="410" x2="400" y2="450" stroke="#6B7280" stroke-width="2" marker-end="url(#arrow)"/>
+
+                <rect x="150" y="460" width="220" height="50" rx="8" fill="#FFFFFF" stroke="#00928F" stroke-width="2"/>
+                <text x="260" y="490" font-size="14" font-weight="bold" fill="#1F2937" text-anchor="middle">PERUBAHAN KEBIASAAN</text>
+
+                <rect x="430" y="460" width="220" height="50" rx="8" fill="#FFFFFF" stroke="#00928F" stroke-width="2"/>
+                <text x="540" y="490" font-size="14" font-weight="bold" fill="#00928F" text-anchor="middle">RUJUKAN FKTP (SATUSEHAT)</text>
+
+                <line x1="400" y1="410" x2="260" y2="450" stroke="#6B7280" stroke-width="2" marker-end="url(#arrow)"/>
+                <line x1="400" y1="410" x2="540" y2="450" stroke="#6B7280" stroke-width="2" marker-end="url(#arrow)"/>
+
+                <defs>
+                    <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+                        <path d="M0,0 L0,6 L9,3 z" fill="#6B7280" />
+                    </marker>
+                </defs>
+            </svg>`;
+
+            const blob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+
+            setTimeout(() => {
+                if (format === 'svg') {
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'Alur_Kerja_MetabolicBuddy.svg';
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    showToast('✅ Berhasil mengunduh format SVG');
+                } else if (format === 'png') {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = 800;
+                    canvas.height = 600;
+                    const ctx = canvas.getContext('2d');
+                    const img = new Image();
+                    img.onload = function() {
+                        ctx.drawImage(img, 0, 0);
+                        const pngUrl = canvas.toDataURL('image/png');
+                        const a = document.createElement('a');
+                        a.href = pngUrl;
+                        a.download = 'Alur_Kerja_MetabolicBuddy.png';
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                        URL.revokeObjectURL(url);
+                        showToast('✅ Berhasil mengunduh format PNG');
+                    };
+                    img.src = url;
+                }
+            }, 800);
+        }
+    </script>
+</body>
+</html>
